@@ -20,9 +20,9 @@ class TokenService:
     @staticmethod
     def encode_jwt(
             payload: dict,
-            private_key: str = settings.auth_jwt.private_key.read_text(),
-            algorithm: str = settings.auth_jwt.algorithm,
-            expire_minutes: int = settings.auth_jwt.access_token_expire_minute
+            private_key: str = settings.auth_jwt.PRIVATE_KEY.read_text(),
+            algorithm: str = settings.auth_jwt.ALGORITHM,
+            expire_minutes: int = settings.auth_jwt.ACCESS_TOKEN_EXPIRE_MINUTE
     ):
         to_encode = payload.copy()
         now_time = datetime.utcnow()
@@ -35,8 +35,8 @@ class TokenService:
     @staticmethod
     def decode_jwt(
             token: bytes | str,
-            public_key: str = settings.auth_jwt.public_key.read_text(),
-            algorithm: str = settings.auth_jwt.algorithm
+            public_key: str = settings.auth_jwt.PUBLIC_KEY.read_text(),
+            algorithm: str = settings.auth_jwt.ALGORITHM
     ):
         decoded = jwt.decode(jwt=token, key=public_key, algorithms=[algorithm])
         return decoded
