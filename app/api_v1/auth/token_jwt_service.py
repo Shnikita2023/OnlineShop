@@ -1,60 +1,101 @@
 from datetime import datetime, timedelta
 
 import jwt
-from fastapi import Cookie, Depends
-from jwt import InvalidTokenError
-from pydantic import BaseModel
+from fastapi import Depends, Response
 
+from app.api_v1.auth.cookie_token_service import cookie_helper
 from app.api_v1.exceptions import CustomException
-from app.api_v1.users.schemas import UserShow
+from app.api_v1.users.schemas import UserCreate
 from app.config import settings
 
 
-class TokenInfo(BaseModel):
-    access_token: str
-    token_type: str = "Bearer"
-
-
 class TokenService:
+    """
+    Класс для кодирования/декодирование jwt токена
+    """
 
-    @staticmethod
-    def encode_jwt(
-            payload: dict,
-            private_key: str = settings.auth_jwt.PRIVATE_KEY.read_text(),
-            algorithm: str = settings.auth_jwt.ALGORITHM,
-            expire_minutes: int = settings.auth_jwt.ACCESS_TOKEN_EXPIRE_MINUTE
-    ):
+    ACCESS_TOKEN_EXPIRE_MINUTE = settings.auth_jwt.ACCESS_TOKEN_EXPIRE_MINUTE
+    REFRESH_TOKEN_EXPIRE_MINUTE = settings.auth_jwt.REFRESH_TOKEN_EXPIRE_MINUTE
+    PRIVATE_KEY = settings.auth_jwt.PRIVATE_KEY.read_text()
+    PUBLIC_KEY = settings.auth_jwt.PUBLIC_KEY.read_text()
+    ALGORITHM = settings.auth_jwt.ALGORITHM
+
+    @classmethod
+    def encode_jwt(cls, payload: dict):
+
+        if len(payload) > 1:
+            expire_minutes = cls.ACCESS_TOKEN_EXPIRE_MINUTE
+        else:
+            expire_minutes = cls.REFRESH_TOKEN_EXPIRE_MINUTE
+
         to_encode = payload.copy()
         now_time = datetime.utcnow()
         expire_token = now_time + timedelta(minutes=expire_minutes)
         to_encode.update(exp=expire_token, iat=now_time)
-
-        encoded = jwt.encode(payload=to_encode, key=private_key, algorithm=algorithm)
+        encoded = jwt.encode(payload=to_encode, key=cls.PRIVATE_KEY, algorithm=cls.ALGORITHM)
         return encoded
 
-    @staticmethod
-    def decode_jwt(
-            token: bytes | str,
-            public_key: str = settings.auth_jwt.PUBLIC_KEY.read_text(),
-            algorithm: str = settings.auth_jwt.ALGORITHM
-    ):
-        decoded = jwt.decode(jwt=token, key=public_key, algorithms=[algorithm])
+    @classmethod
+    def decode_jwt(cls, token: bytes | str):
+        try:
+            decoded = jwt.decode(jwt=token, key=cls.PUBLIC_KEY, algorithms=[cls.ALGORITHM])
+
+        except jwt.ExpiredSignatureError:
+            decoded = jwt.decode(jwt=token,
+                                 key=cls.PUBLIC_KEY,
+                                 algorithms=[cls.ALGORITHM],
+                                 options={"verify_exp": False})
         return decoded
 
 
 class TokenWork(TokenService):
-    COOKIE_SESSION_KEY: str = settings.session_cookie.COOKIE_SESSION_KEY
-    COOKIE_SESSION_TIME: int = settings.session_cookie.COOKIE_SESSION_TIME
-
-    @staticmethod
-    def get_token_data(token_jwt: str = Cookie(alias=COOKIE_SESSION_KEY, default=None)) -> str:
-        if token_jwt:
-            return token_jwt
-        raise CustomException(exception="invalid cookie").http_error_401
+    """Класс для работы с токенами пользователей"""
 
     @classmethod
-    def get_current_token_payload(cls, token: str = Depends(get_token_data)) -> UserShow:
+    def create_tokens(cls, user: UserCreate, response: Response) -> tuple:
+        access_jwt_payload = {
+            "sub": user.id,
+            "username": user.username,
+            "email": user.email,
+            "is_superuser": user.is_superuser
+        }
+        refresh_jwt_payload = {"sub": user.id}
+        access_token = cls.encode_jwt(payload=access_jwt_payload)
+        refresh_token = cls.encode_jwt(payload=refresh_jwt_payload)
+        cookie_helper.create_cookie_for_tokens(response, access_token, refresh_token)
+        return access_token, refresh_token
+
+    @classmethod
+    def create_new_access_token(cls, access_token_payload: dict) -> str:
+        new_access_token = cls.encode_jwt(payload=access_token_payload)
+        return new_access_token
+
+    @classmethod
+    def check_expires_tokens(cls,
+                             access_token_payload: dict,
+                             refresh_token_payload: dict) -> str | None:
+        expire_access_token = datetime.fromtimestamp(access_token_payload["exp"])
+        expire_refresh_token = datetime.fromtimestamp(refresh_token_payload["exp"])
+        if expire_access_token <= datetime.now() and expire_refresh_token <= datetime.now():
+            raise CustomException(exception="invalid token").http_error_401
+
+        if expire_access_token <= datetime.now():
+            return cls.create_new_access_token(access_token_payload)
+
+        return None
+
+    @classmethod
+    def get_current_token_payload(cls,
+                                  response: Response,
+                                  cookie_tokens: str = Depends(cookie_helper.get_cookie_tokens)) -> dict:
         try:
-            return cls.decode_jwt(token=token)
-        except InvalidTokenError:
-            raise CustomException(exception="invalid cookie").http_error_401
+            access_token, refresh_token = cookie_helper.parsing_cookie_tokens(cookie_tokens)
+            access_token_payload: dict = cls.decode_jwt(token=access_token)
+            refresh_token_payload: dict = cls.decode_jwt(token=refresh_token)
+            new_token: str | None = cls.check_expires_tokens(access_token_payload, refresh_token_payload)
+            if new_token:
+                cookie_helper.create_cookie_for_tokens(response, new_token, refresh_token)
+            return access_token_payload
+
+        except jwt.InvalidTokenError:
+            raise CustomException(exception="invalid token").http_error_401

@@ -1,4 +1,4 @@
-from fastapi import Depends, Form
+from fastapi import Depends, Form, Response
 from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -33,7 +33,8 @@ class AuthUser:
         return user
 
     @staticmethod
-    async def get_current_auth_user(payload: dict = Depends(TokenWork.get_current_token_payload),
+    async def get_current_auth_user(response: Response,
+                                    payload: dict = Depends(TokenWork.get_current_token_payload),
                                     session: AsyncSession = Depends(get_async_session)) -> dict:
         user_id: int = payload.get("sub")
         user: User | None = await UserValidator.validate_user_data_by_id(user_id=user_id,

@@ -55,11 +55,12 @@ class SessionCookie(BaseSettings):
     COOKIE_SESSION_TIME: int = os.getenv("COOKIE_SESSION_TIME")
 
 
-class AuthJWT(BaseModel):
+class AuthJWT(BaseSettings):
     PRIVATE_KEY: Path = BASE_DIR / "certs" / "jwt-private.pem"
     PUBLIC_KEY: Path = BASE_DIR / "certs" / "jwt-public.pem"
     ALGORITHM: str = "RS256"
     ACCESS_TOKEN_EXPIRE_MINUTE: int = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTE")
+    REFRESH_TOKEN_EXPIRE_MINUTE: int = os.getenv("REFRESH_TOKEN_EXPIRE_MINUTE")
 
 
 class Settings:

@@ -7,7 +7,7 @@ from app.db import Base
 
 
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "user"
 
     username: Mapped[str] = mapped_column(String(50))
     password: Mapped[bytes]

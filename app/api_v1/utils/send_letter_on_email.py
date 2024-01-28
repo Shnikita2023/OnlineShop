@@ -1,7 +1,6 @@
 import aiosmtplib
 
 from email.message import EmailMessage
-
 from aiosmtplib import SMTPConnectError
 from pydantic import EmailStr
 
@@ -30,7 +29,7 @@ async def connect_smtp(body: str, email: EmailStr, subject: str) -> None:
 async def send_letter_on_after_register(email: EmailStr) -> None:
     try:
         body = ("Регистрация успешно пройдена!\n"
-                "Добро пожаловать в магазин 'Shop'!")
+                "Добро пожаловать в магазин 'OnlineShop'!")
         subject = "Регистрация прошла успешно"
         await connect_smtp(body=body, email=email, subject=subject)
 

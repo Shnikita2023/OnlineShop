@@ -2,7 +2,6 @@ import secrets
 
 from pydantic import EmailStr
 from redis.asyncio.client import Redis
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_v1.auth.password_service import password_service
@@ -14,7 +13,9 @@ from app.api_v1.utils.send_letter_on_email import send_password_reset_email
 
 
 class PasswordForgot:
-    """Класс для восстановление пароля пользователя"""
+    """
+    Класс для восстановления пароля пользователя
+    """
 
     def __init__(self,
                  user_email: EmailStr,
@@ -43,7 +44,9 @@ class PasswordForgot:
 
 
 class PasswordReset:
-    """Класс для сброса пароля пользователя"""
+    """
+    Класс для сброса пароля пользователя
+    """
 
     def __init__(self,
                  user_email: EmailStr,
@@ -83,7 +86,9 @@ class PasswordReset:
 
 
 class TokenGenerator:
-    """Класс для генерации токена"""
+    """
+    Класс для генерации простого токена
+    """
 
     @staticmethod
     async def generate_temporary_token() -> str:

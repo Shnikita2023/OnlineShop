@@ -20,6 +20,7 @@ class UserDatabase:
             session.add(user)
             await session.commit()
             return user.to_read_model()
+
         except ConnectionError:
             raise CustomException(exception=cls.error_bd).http_error_500
 
@@ -30,6 +31,7 @@ class UserDatabase:
             result: Result = await session.execute(stmt)
             user: User | None = result.scalar_one_or_none()
             return user
+
         except ConnectionError:
             raise CustomException(exception=cls.error_bd).http_error_500
 
@@ -40,6 +42,7 @@ class UserDatabase:
             result: Result = await session.execute(stmt)
             user: User | None = result.scalar()
             return user
+
         except ConnectionError:
             raise CustomException(exception=cls.error_bd).http_error_500
 
@@ -50,7 +53,7 @@ class UserDatabase:
                                          new_data: Any):
         try:
             stmt = update(User).where(User.id == id_data).values(new_data)
-            result: Result = await session.execute(stmt)
+            await session.execute(stmt)
             await session.commit()
             return new_data
 

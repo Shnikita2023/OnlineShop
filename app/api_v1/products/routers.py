@@ -13,13 +13,13 @@ router = APIRouter(
 )
 
 
-@router.get(path="/{id_product}",
+@router.get(path="/{product_id}",
             summary='Получение продукта',
             response_model=ProductShow
             )
-async def get_product(id_product: int,
+async def get_product(product_id: int,
                       session: AsyncSession = Depends(get_async_session)) -> ProductShow:
-    return await product_service.get_product(id_product=id_product, session=session)
+    return await product_service.get_product(id_product=product_id, session=session)
 
 
 @router.get(path="/",
@@ -54,26 +54,26 @@ async def create_product(product_data: ProductCreate,
     }
 
 
-@router.delete(path="/{id_product}",
+@router.delete(path="/{product_id}",
                summary='Удаление продукта',
                status_code=status.HTTP_204_NO_CONTENT
                )
 async def delete_product(
-        id_product: int,
+        product_id: int,
         session: AsyncSession = Depends(get_async_session)) -> None:
-    await product_service.delete_product(id_product=id_product, session=session)
+    await product_service.delete_product(id_product=product_id, session=session)
     return None
 
 
 #
-@router.put(path="/{id_product}",
+@router.put(path="/{product_id}",
             summary='Обновление продукта'
             )
 async def update_product(
-        id_product: int,
+        product_id: int,
         product_update: ProductUpdate,
         session: AsyncSession = Depends(get_async_session)) -> dict[str, Any]:
-    return await product_service.update_product(id_product=id_product,
+    return await product_service.update_product(id_product=product_id,
                                                 session=session,
                                                 new_product=product_update)
 #

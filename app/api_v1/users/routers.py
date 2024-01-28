@@ -1,12 +1,12 @@
-from datetime import datetime, timedelta
-
 from fastapi import APIRouter, Depends, Response, status
 from fastapi_cache.decorator import cache
 from redis.asyncio.client import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_v1.auth import AuthUser
-from app.api_v1.auth.token_jwt_service import TokenWork, TokenInfo
+from app.api_v1.auth.cookie_token_service import cookie_helper
+from app.api_v1.auth.schemas import TokenInfo
+from app.api_v1.auth.token_jwt_service import TokenWork
 from app.api_v1.users import user_manager
 from app.api_v1.users.schemas import UserCreate, UserShow, ForgotUser, ResetUser
 from app.api_v1.users.utils import PasswordForgot, PasswordReset
@@ -31,29 +31,21 @@ async def register_user(user_data: UserCreate,
              summary="Аутентификация пользователя")
 async def login_user(response: Response,
                      user: UserCreate = Depends(AuthUser.validate_auth_user)) -> TokenInfo:
-    jwt_payload = {
-        "sub": user.id,
-        "username": user.username,
-        "email": user.email,
-        "is_superuser": user.is_superuser
-    }
-    token = TokenWork.encode_jwt(payload=jwt_payload)
-    expires = datetime.utcnow() + timedelta(minutes=TokenWork.COOKIE_SESSION_TIME)
-    expires_cookie = expires.strftime('%a, %d %b %Y %H:%M:%S GMT')
-    response.set_cookie(TokenWork.COOKIE_SESSION_KEY, token, expires=expires_cookie)
-    return TokenInfo(access_token=token)
+    access_token, refresh_token = TokenWork.create_tokens(user=user, response=response)
+    return TokenInfo(access_token=access_token, refresh_token=refresh_token)
 
 
 @router.get(path="/logout", summary="Выход пользователя")
 async def logout_user(response: Response,
-                      current_user: dict = Depends(TokenWork.get_token_data)) -> dict[str, str]:
-    response.delete_cookie(TokenWork.COOKIE_SESSION_KEY)
+                      current_user: dict = Depends(cookie_helper.get_cookie_tokens)) -> dict[str, str]:
+    response.delete_cookie(cookie_helper.COOKIE_SESSION_KEY)
     return {"message": "logout successful"}
 
 
 @router.get(path="/me", summary="Получение данных о пользователе")
 @cache(expire=60)
-async def auth_user_check_self_info(user: dict = Depends(AuthUser.get_current_auth_user)) -> dict:
+async def auth_user_check_self_info(response: Response,
+                                    user: dict = Depends(AuthUser.get_current_auth_user)) -> dict:
     return {
         "id": user["sub"],
         "username": user["username"],

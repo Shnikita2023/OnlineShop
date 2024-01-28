@@ -8,6 +8,10 @@ from app.api_v1.users.models import User
 
 
 class UserValidator:
+    """
+    Класс для проверки данных пользователя
+    """
+
     @staticmethod
     async def validate_user_data_by_email(user_email: EmailStr,
                                           session: AsyncSession) -> Optional[User]:

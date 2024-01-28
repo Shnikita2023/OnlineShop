@@ -16,12 +16,12 @@ class UserCreator:
         user_data.password = hashed_password
 
         created_user = await user_db.create_user(session=session, user_data=user_data)
-        await self.on_after_register(created_user)
+        await self._on_after_register(created_user)
         logger.info(f"Пользователь {created_user.username} с id {created_user.id} успешно создан. Status: 201")
         return created_user
 
     @staticmethod
-    async def on_after_register(user: UserShow) -> None:
+    async def _on_after_register(user: UserShow) -> None:
         await send_letter_on_after_register(email=user.email)
         logger.info(f"Успешная отправка письма о регистрации на email '{user.email}'")
 

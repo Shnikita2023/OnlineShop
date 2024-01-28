@@ -15,13 +15,13 @@ router = APIRouter(
 )
 
 
-@router.get(path="/{id_category}",
+@router.get(path="/{category_id}",
             summary='Получение категории',
             response_model=CategoryShow
             )
-async def get_category(id_category: int,
+async def get_category(category_id: int,
                        session: AsyncSession = Depends(get_async_session)) -> CategoryShow:
-    return await category_service.get_category(id_category=id_category, session=session)
+    return await category_service.get_category(id_category=category_id, session=session)
 
 
 #
@@ -51,31 +51,31 @@ async def create_category(category_data: CategoryCreate,
     raise CustomException(exception="access denied.").http_error_403
 
 
-@router.delete(path="/{id_category}",
+@router.delete(path="/{category_id}",
                summary='Удаление категории',
                status_code=status.HTTP_204_NO_CONTENT
                )
 async def delete_category(
-        id_category: int,
+        category_id: int,
         session: AsyncSession = Depends(get_async_session),
         user: dict = Depends(AuthUser.get_current_auth_user)) -> None:
     if user["is_superuser"] is True:
-        await category_service.delete_category(id_category=id_category, session=session)
+        await category_service.delete_category(id_category=category_id, session=session)
         return None
     raise CustomException(exception="access denied.").http_error_403
 
 
 #
-@router.put(path="/{id_category}",
+@router.put(path="/{category_id}",
             summary='Обновление категории'
             )
 async def update_category(
-        id_category: int,
+        category_id: int,
         category_update: CategoryUpdate,
         session: AsyncSession = Depends(get_async_session),
         user: dict = Depends(AuthUser.get_current_auth_user)) -> dict[str, Any]:
     if user["is_superuser"] is True:
-        return await category_service.update_category(id_category=id_category,
+        return await category_service.update_category(id_category=category_id,
                                                       session=session,
                                                       new_category=category_update)
     raise CustomException(exception="access denied.").http_error_403

@@ -9,6 +9,9 @@ from app.api_v1.users.schemas import UserCreate
 
 
 class UserManager:
+    """
+    Пользовательский менеджер для работы с пользователем
+    """
 
     async def create(
             self,
