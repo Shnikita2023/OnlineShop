@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from fastapi import Cookie, Response
 
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 from app.config import settings
 
 
@@ -19,7 +19,7 @@ class CookieTokenHelper:
     def get_cookie_tokens(cls, cookie_tokens: str = Cookie(alias=COOKIE_SESSION_KEY, default=None)) -> str:
         if cookie_tokens:
             return cookie_tokens
-        raise CustomException(exception="invalid cookie").http_error_401
+        raise HttpAPIException(exception="invalid cookie").http_error_401
 
     @classmethod
     def create_cookie_for_tokens(cls,

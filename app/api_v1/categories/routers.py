@@ -1,12 +1,13 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, status
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_v1.auth.user_auth import AuthUser
 from app.api_v1.categories import CategoryShow, CategoryCreate, CategoryUpdate
 from app.api_v1.categories.services import category_service
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 from app.db import get_async_session
 
 router = APIRouter(
@@ -24,12 +25,11 @@ async def get_category(category_id: int,
     return await category_service.get_category(id_category=category_id, session=session)
 
 
-#
-#
 @router.get(path="/",
             summary='Получение всех категории товаров',
             response_model=list[CategoryShow]
             )
+@cache(expire=600)
 async def get_categories(session: AsyncSession = Depends(get_async_session)) -> list[CategoryShow]:
     return await category_service.get_categories(session=session)
 
@@ -41,6 +41,7 @@ async def get_categories(session: AsyncSession = Depends(get_async_session)) -> 
 async def create_category(category_data: CategoryCreate,
                           session: AsyncSession = Depends(get_async_session),
                           user: dict = Depends(AuthUser.get_current_auth_user)) -> dict:
+
     if user["is_superuser"] is True:
         number_category: int = await category_service.add_category(session=session,
                                                                    category_data=category_data)
@@ -48,7 +49,8 @@ async def create_category(category_data: CategoryCreate,
             "message": f"category creates with {number_category} number successfully",
             "data": category_data
         }
-    raise CustomException(exception="access denied.").http_error_403
+
+    raise HttpAPIException(exception="access denied.").http_error_403
 
 
 @router.delete(path="/{category_id}",
@@ -59,10 +61,12 @@ async def delete_category(
         category_id: int,
         session: AsyncSession = Depends(get_async_session),
         user: dict = Depends(AuthUser.get_current_auth_user)) -> None:
+
     if user["is_superuser"] is True:
         await category_service.delete_category(id_category=category_id, session=session)
         return None
-    raise CustomException(exception="access denied.").http_error_403
+
+    raise HttpAPIException(exception="access denied.").http_error_403
 
 
 #
@@ -74,8 +78,10 @@ async def update_category(
         category_update: CategoryUpdate,
         session: AsyncSession = Depends(get_async_session),
         user: dict = Depends(AuthUser.get_current_auth_user)) -> dict[str, Any]:
+
     if user["is_superuser"] is True:
         return await category_service.update_category(id_category=category_id,
                                                       session=session,
                                                       new_category=category_update)
-    raise CustomException(exception="access denied.").http_error_403
+
+    raise HttpAPIException(exception="access denied.").http_error_403

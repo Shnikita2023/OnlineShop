@@ -4,7 +4,7 @@ from email.message import EmailMessage
 from aiosmtplib import SMTPConnectError
 from pydantic import EmailStr
 
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 from app.config import settings
 
 
@@ -23,7 +23,7 @@ async def connect_smtp(body: str, email: EmailStr, subject: str) -> None:
 
     except SMTPConnectError:
         error = f"Error connecting to {settings.email.SMTP_HOST} on port {settings.email.SMTP_PORT}"
-        raise CustomException(exception=error).http_error_500
+        raise HttpAPIException(exception=error).http_error_500
 
 
 async def send_letter_on_after_register(email: EmailStr) -> None:
@@ -34,7 +34,7 @@ async def send_letter_on_after_register(email: EmailStr) -> None:
         await connect_smtp(body=body, email=email, subject=subject)
 
     except Exception:
-        raise CustomException(exception="Ошибка отправки письма").http_error_500
+        raise HttpAPIException(exception="Ошибка отправки письма").http_error_500
 
 
 async def send_password_reset_email(email: EmailStr, token: str):
@@ -45,4 +45,4 @@ async def send_password_reset_email(email: EmailStr, token: str):
         await connect_smtp(body=body, email=email, subject=subject)
 
     except Exception:
-        raise CustomException(exception="Ошибка отправки письма").http_error_500
+        raise HttpAPIException(exception="Ошибка отправки письма").http_error_500

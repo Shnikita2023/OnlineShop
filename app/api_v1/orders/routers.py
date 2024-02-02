@@ -1,4 +1,3 @@
-
 from redis.asyncio.client import Redis
 from starlette import status
 
@@ -9,7 +8,7 @@ from app.db import get_async_session
 from app.api_v1.auth import AuthUser
 from . import OrderCreate, OrderItemCreate, OrderUpdate
 from .services import order_service, order_item_service
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 from ...db.database import get_async_redis_client
 
 router_order = APIRouter(
@@ -37,7 +36,7 @@ async def create_order(order: OrderCreate,
         return {
             "message": f"order created with {number_order} number successfully"
         }
-    raise CustomException(exception="access denied.").http_error_403
+    raise HttpAPIException(exception="access denied.").http_error_403
 
 
 @router_order.get(path="/{order_id}",
@@ -61,6 +60,17 @@ async def update_order(order_id: int,
     return await order_service.update_order(session=session,
                                             new_order=new_order,
                                             order_id=order_id)
+
+
+@router_order.delete(path="/{order_id}",
+                     summary="Удаление заказа пользователя",
+                     status_code=status.HTTP_204_NO_CONTENT)
+async def delete_order(order_id: int,
+                       session: AsyncSession = Depends(get_async_session),
+                       user: dict = Depends(AuthUser.get_current_auth_user)) -> None:
+    await order_service.delete_order(session=session,
+                                     order_id=order_id)
+    return None
 
 
 @router_order_item.post(path="/",

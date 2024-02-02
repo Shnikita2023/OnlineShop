@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
@@ -55,6 +54,10 @@ class SessionCookie(BaseSettings):
     COOKIE_SESSION_TIME: int = os.getenv("COOKIE_SESSION_TIME")
 
 
+class SentryAPI(BaseSettings):
+    SENTRY_DSN: str = os.getenv("SENTRY_DSN")
+
+
 class AuthJWT(BaseSettings):
     PRIVATE_KEY: Path = BASE_DIR / "certs" / "jwt-private.pem"
     PUBLIC_KEY: Path = BASE_DIR / "certs" / "jwt-public.pem"
@@ -69,6 +72,7 @@ class Settings:
     email: EmailSettings = EmailSettings()
     redis: RedisSettings = RedisSettings()
     session_cookie: SessionCookie = SessionCookie()
+    sentry_dsn: SentryAPI = SentryAPI()
 
 
 settings = Settings()

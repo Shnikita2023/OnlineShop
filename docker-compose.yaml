@@ -2,12 +2,30 @@ version: '3.9'
 
 services:
 
+  fast_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: "fast_api_shop"
+    volumes:
+      - .:/online_shop
+    env_file:
+      - .env
+    depends_on:
+      - database
+      - database_test
+      - redis_app
+    ports:
+      - "8000:8000"
+    networks:
+      - custom
+
   database:
     image: postgres
     restart: always
     container_name: "database_online_shop"
     volumes:
-      - /home/nikita/PSQL/data:/var/lib/postgresql/data
+      - ./pg_data:/var/lib/postgresql/data
     env_file:
       - .env
     ports:
@@ -20,7 +38,7 @@ services:
     restart: always
     container_name: "database_online_shop_test"
     volumes:
-      - /home/nikita/PSQL/data_test:/var/lib/postgresql/data
+      - ./pg_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=shop_db_test

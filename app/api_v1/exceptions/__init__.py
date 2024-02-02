@@ -3,5 +3,5 @@ __all__ = (
 )
 
 
-from .exception import CustomException
+from .exception import HttpAPIException
 

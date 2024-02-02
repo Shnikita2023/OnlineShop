@@ -2,9 +2,9 @@ from typing import Any, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api_v1.categories import Category, CategoryCreate, CategoryUpdate, CategoryShow
+from app.api_v1.categories import CategoryCreate, CategoryUpdate, CategoryShow
 from app.api_v1.categories.repository import CategoryRepository
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 
 
 class CategoryService:
@@ -23,9 +23,11 @@ class CategoryService:
     @staticmethod
     async def get_category(id_category: int, session: AsyncSession) -> CategoryShow:
         category: dict = await CategoryRepository(session=session).find_one(id_data=id_category)
+
         if category:
             return CategoryShow(**category)
-        raise CustomException(exception="id category is not found").http_error_400
+
+        raise HttpAPIException(exception="id category is not found").http_error_400
 
     @staticmethod
     async def delete_category(id_category: int, session: AsyncSession) -> int:

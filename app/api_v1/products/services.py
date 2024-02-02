@@ -2,7 +2,7 @@ from typing import Any, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 from app.api_v1.products.repository import ProductRepository
 from app.api_v1.products.schemas import ProductCreate, ProductUpdate
 
@@ -23,7 +23,7 @@ class ProductService:
         product = await ProductRepository(session=session).find_one(id_data=id_product)
         if product:
             return product
-        raise CustomException(exception="product is not found").http_error_400
+        raise HttpAPIException(exception="product is not found").http_error_400
 
     @staticmethod
     async def get_product_by_param(param_colum_product: str,
@@ -33,7 +33,7 @@ class ProductService:
                                                                              param_value=product_value)
         if product:
             return product
-        raise CustomException(exception="product is not found").http_error_400
+        raise HttpAPIException(exception="product is not found").http_error_400
 
     @staticmethod
     async def delete_product(id_product: int, session: AsyncSession) -> int:

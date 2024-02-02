@@ -25,8 +25,10 @@ class UserCreator:
         await send_letter_on_after_register(email=user.email)
         logger.info(f"Успешная отправка письма о регистрации на email '{user.email}'")
 
-    # @staticmethod
-    # async def on_after_forgot_password(user: User,
-    #                                    token: str,
-    #                                    request: Optional[Request] = None) -> None:
-    #     await send_password_reset_email(email=user.email, token=token)
+
+user_creator = UserCreator()
+# @staticmethod
+# async def on_after_forgot_password(user: User,
+#                                    token: str,
+#                                    request: Optional[Request] = None) -> None:
+#     await send_password_reset_email(email=user.email, token=token)

@@ -7,7 +7,7 @@ from app.api_v1.cart.repository import CartItemRepository, CartRepository
 from app.api_v1.cart.schemas import (CartItemCreate, CartCreate, CartItemShow,
                                      CartItemUpdatePartial, CartItemUpdate, CartShow)
 
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 
 
 class CartItemService:
@@ -18,28 +18,37 @@ class CartItemService:
                             user_current: dict) -> int:
         try:
             cart_user: CartShow = await CartService.get_cart(session=session, cart_id=cart_item_data.cart_id)
+
             if cart_user.user_id == user_current["sub"]:
                 cart_item_dict: dict[str, Any] = cart_item_data.model_dump()
                 return await CartItemRepository(session=session).add_one(data=cart_item_dict)
-            raise CustomException(exception="access denied.").http_error_403
+
+            raise HttpAPIException(exception="access denied.").http_error_403
+
         except IntegrityError:
-            raise CustomException(exception="the product in cart already exists").http_error_400
+            raise HttpAPIException(exception="the product in cart already exists").http_error_400
 
     @staticmethod
     async def get_cart_items(session: AsyncSession, user_current: dict, cart_id: int) -> list[CartItemShow]:
         cart_user: CartShow = await CartService.get_cart(session=session, cart_id=cart_id)
+
         if cart_user.user_id == user_current["sub"]:
             return await CartItemRepository(session=session).find_by_param(param_column="cart_id", value=cart_id)
-        raise CustomException(exception="access denied.").http_error_403
+
+        raise HttpAPIException(exception="access denied.").http_error_403
 
     @staticmethod
     async def get_cart_item(session: AsyncSession, user_current: dict, cart_item_id: int) -> CartItemShow:
         cart_item: CartItemShow = await CartItemRepository(session=session).find_one(id_data=cart_item_id)
+
         if not cart_item:
-            raise CustomException(exception="element cart not found").http_error_400
+            raise HttpAPIException(exception="element cart not found").http_error_400
+
         cart_user: CartShow = await CartService.get_cart(session=session, cart_id=cart_item.cart_id)
+
         if cart_user.user_id != user_current["sub"]:
-            raise CustomException(exception="access denied.").http_error_403
+            raise HttpAPIException(exception="access denied.").http_error_403
+
         return cart_item
 
     @staticmethod
@@ -74,7 +83,7 @@ class CartService:
             cart_dict: dict[str, Any] = cart_data.model_dump()
             return await CartRepository(session=session).add_one(data=cart_dict)
 
-        raise CustomException(exception="cart already exist").http_error_400
+        raise HttpAPIException(exception="cart already exist").http_error_400
 
     @staticmethod
     async def delete_cart(session: AsyncSession, user_id: int) -> int:
@@ -83,9 +92,11 @@ class CartService:
     @staticmethod
     async def get_cart(session: AsyncSession, cart_id: int) -> CartShow:
         cart: dict = await CartRepository(session=session).find_one(id_data=cart_id)
+
         if cart:
             return CartShow(**cart)
-        raise CustomException(exception="cart is not found").http_error_400
+
+        raise HttpAPIException(exception="cart is not found").http_error_400
 
     @staticmethod
     async def get_cart_by_param(session: AsyncSession, value_cart: Any, name_column: str) -> CartShow:
@@ -93,7 +104,8 @@ class CartService:
                                                                                        param_value=value_cart)
         if cart:
             return CartShow(**cart)
-        raise CustomException(exception="cart is not found").http_error_400
+
+        raise HttpAPIException(exception="cart is not found").http_error_400
 
 
 cart_item_service = CartItemService()

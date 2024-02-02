@@ -8,7 +8,7 @@ from .schemas import CartCreate, CartItemCreate, CartItemShow, CartItemUpdate, C
 from app.db import get_async_session
 from .services import cart_item_service, cart_service
 from app.api_v1.auth import AuthUser
-from ..exceptions import CustomException
+from ..exceptions import HttpAPIException
 
 router_cart_item = APIRouter(
     prefix="/cart_items",
@@ -97,7 +97,7 @@ async def create_cart(cart: CartCreate,
         return {
             "message": f"cart created with {number_cart} number successfully"
         }
-    raise CustomException(exception="access denied.").http_error_403
+    raise HttpAPIException(exception="access denied.").http_error_403
 
 
 @router_cart.get(path="/{cart_id}",
@@ -109,7 +109,7 @@ async def get_cart(cart_id: int,
     cart_user: CartShow = await cart_service.get_cart(session=session, cart_id=cart_id)
     if cart_user.user_id == user["sub"]:
         return cart_user
-    raise CustomException(exception="access denied.").http_error_403
+    raise HttpAPIException(exception="access denied.").http_error_403
 
 
 @router_cart.get(path="/",
@@ -136,4 +136,4 @@ async def delete_cart(user_id: int,
         return {
             "message": f"cart removed with {number_cart} number successfully"
         }
-    raise CustomException(exception="access denied.").http_error_403
+    raise HttpAPIException(exception="access denied.").http_error_403

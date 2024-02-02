@@ -43,7 +43,6 @@ async def logout_user(response: Response,
 
 
 @router.get(path="/me", summary="Получение данных о пользователе")
-@cache(expire=60)
 async def auth_user_check_self_info(response: Response,
                                     user: dict = Depends(AuthUser.get_current_auth_user)) -> dict:
     return {

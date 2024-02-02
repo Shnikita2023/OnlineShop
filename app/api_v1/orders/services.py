@@ -3,7 +3,7 @@ from typing import Any
 from redis.asyncio.client import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 from app.api_v1.orders import OrderCreate, OrderItemCreate, OrderItemShow, OrderUpdate
 from app.api_v1.orders.repository import OrderRepository, OrderItemRepository
 
@@ -80,7 +80,7 @@ class OrderService:
                         order_id: int) -> dict:
         order = await OrderRepository(session=session).find_one(id_data=order_id)
         if not order:
-            raise CustomException(exception="order not found").http_error_400
+            raise HttpAPIException(exception="order not found").http_error_400
         is_modified_order_id: bool = await redis_client.get(f"modified_order_{order_id}")
         if is_modified_order_id == "True":
             all_items_order: list[OrderItemShow] = await OrderItemService.get_order_items(session=session,
@@ -98,13 +98,13 @@ class OrderService:
     async def update_order(session: AsyncSession, order_id: int, new_order: OrderUpdate) -> dict:
         order_dict: dict[str, Any] = new_order.model_dump()
         return await OrderRepository(session=session).update_one(id_data=order_id, new_data=order_dict)
-    #
-    # @staticmethod
-    # async def get_cart(session: AsyncSession, cart_id: int) -> CartShow:
-    #     cart = await CartRepository(session=session).find_one(id_data=cart_id)
-    #     if cart:
-    #         return cart
-    #     raise CustomException(exception="cart is not found").http_error_400
+
+    @staticmethod
+    async def delete_order(session: AsyncSession, order_id: int) -> int:
+        return await OrderRepository(session=session).delete_one(id_data=order_id)
+
+
+
 
 
 order_item_service = OrderItemService()

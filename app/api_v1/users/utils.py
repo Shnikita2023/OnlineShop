@@ -5,7 +5,7 @@ from redis.asyncio.client import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_v1.auth.password_service import password_service
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 from app.api_v1.users.database import user_db
 from app.api_v1.users.models import User
 from app.api_v1.users.validators import UserValidator
@@ -35,7 +35,7 @@ class PasswordForgot:
                                           redis_client=self.redis_client)
             await send_password_reset_email(email=user.email, token=token)
             return {"message": "На ваш email отправлена ссылка на сброс пароля"}
-        raise CustomException(exception="check the correctness your email").http_error_400
+        raise HttpAPIException(exception="check the correctness your email").http_error_400
 
     @staticmethod
     async def set_token_by_redis(user_id: int, token: str, redis_client: Redis):
@@ -73,7 +73,7 @@ class PasswordReset:
                                                      id_data=user_current.id,
                                                      new_data=new_data)
             return {"message": "Пароль успешно сброшен"}
-        raise CustomException(exception="check the correctness your email").http_error_400
+        raise HttpAPIException(exception="check the correctness your email").http_error_400
 
     @staticmethod
     async def verify_token(token: str,
@@ -82,7 +82,7 @@ class PasswordReset:
         token_key: str = await redis_client.get(f"user_{user_id}")
         if token == token_key:
             return True
-        raise CustomException(exception="Token not found").http_error_400
+        raise HttpAPIException(exception="Token not found").http_error_400
 
 
 class TokenGenerator:

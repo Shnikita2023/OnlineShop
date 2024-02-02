@@ -3,7 +3,7 @@ from typing import Any, Optional
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 from app.api_v1.profiles.repository import ProfileRepository
 from app.api_v1.profiles.schemas import ProfileCreate, ProfileShow, ProfileUpdate
 
@@ -14,11 +14,11 @@ class ProfileService:
     async def add_profile_user(profile_data: ProfileCreate, session: AsyncSession) -> int:
         try:
             if profile_data.user_id <= 0:
-                raise CustomException(exception="inadmissible user_id").http_error_400
+                raise HttpAPIException(exception="inadmissible user_id").http_error_400
             profile_dict: dict[str, Any] = profile_data.model_dump()
             return await ProfileRepository(session=session).add_one(data=profile_dict)
         except IntegrityError:
-            raise CustomException(exception="the profile already exists").http_error_400
+            raise HttpAPIException(exception="the profile already exists").http_error_400
 
     @staticmethod
     async def get_profiles_users(session: AsyncSession) -> list[ProfileShow]:
@@ -32,7 +32,7 @@ class ProfileService:
 
         if profile_user:
             return profile_user
-        raise CustomException(exception="profile not found").http_error_400
+        raise HttpAPIException(exception="profile not found").http_error_400
 
     @staticmethod
     async def delete_profile_user(user_id: int, session: AsyncSession) -> int:

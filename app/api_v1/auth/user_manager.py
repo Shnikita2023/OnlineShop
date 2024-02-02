@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api_v1.users.creators import UserCreator
+from app.api_v1.users.creators import user_creator
 from app.api_v1.users.validators import UserValidator
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 from app.api_v1.users import UserShow
 from app.api_v1.users.models import User
 from app.api_v1.users.schemas import UserCreate
@@ -21,8 +21,8 @@ class UserManager:
                                                                                      user_email=user_data.email)
         if existing_user is not None:
             error_message = "Данный пользователь уже зарегистрирован, выберите другой email."
-            raise CustomException(error_message).http_error_400
-        return await UserCreator().create_user(user_data, session)
+            raise HttpAPIException(error_message).http_error_400
+        return await user_creator.create_user(user_data, session)
 
 
 user_manager = UserManager()

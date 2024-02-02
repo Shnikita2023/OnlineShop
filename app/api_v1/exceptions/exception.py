@@ -7,7 +7,7 @@ from app.logging_config import MyLogger
 loger = MyLogger().logger
 
 
-class CustomException(Exception):
+class HttpAPIException(Exception):
 
     def __init__(self, exception: str = ""):
         self.exception = exception

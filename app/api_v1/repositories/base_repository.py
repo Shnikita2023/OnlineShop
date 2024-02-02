@@ -5,7 +5,7 @@ from sqlalchemy import insert, select, delete, update
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 
 
 class AbstractRepository(ABC):
@@ -44,7 +44,7 @@ class AbstractRepository(ABC):
 
 class SQLAlchemyRepository(AbstractRepository):
     model = None
-    error_bd = "Ошибка подключение к БД"
+    error_500_by_bd = "Ошибка подключение к БД"
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
@@ -57,7 +57,7 @@ class SQLAlchemyRepository(AbstractRepository):
             return result.scalar_one()
 
         except ConnectionError:
-            raise CustomException(exception=self.error_bd).http_error_500
+            raise HttpAPIException(exception=self.error_500_by_bd).http_error_500
 
     async def find_all(self) -> list[dict[str, Any]]:
         try:
@@ -67,7 +67,7 @@ class SQLAlchemyRepository(AbstractRepository):
             return list_models
 
         except ConnectionError:
-            raise CustomException(exception=self.error_bd).http_error_500
+            raise HttpAPIException(exception=self.error_500_by_bd).http_error_500
 
     async def find_one_by_param(self, param_column: str, param_value: Any) -> Optional[dict]:
         try:
@@ -78,7 +78,7 @@ class SQLAlchemyRepository(AbstractRepository):
             return jsonable_encoder(model)
 
         except ConnectionError:
-            raise CustomException(exception=self.error_bd).http_error_500
+            raise HttpAPIException(exception=self.error_500_by_bd).http_error_500
 
     async def find_by_param(self, param_column: str, value: Any) -> list[dict[str, Any]]:
         try:
@@ -89,7 +89,7 @@ class SQLAlchemyRepository(AbstractRepository):
             return list_models
 
         except ConnectionError:
-            raise CustomException(exception=self.error_bd).http_error_500
+            raise HttpAPIException(exception=self.error_500_by_bd).http_error_500
 
     async def find_one(self, id_data: int) -> Optional[dict]:
         try:
@@ -99,35 +99,37 @@ class SQLAlchemyRepository(AbstractRepository):
             return jsonable_encoder(model)
 
         except ConnectionError:
-            raise CustomException(exception=self.error_bd).http_error_500
+            raise HttpAPIException(exception=self.error_500_by_bd).http_error_500
 
     async def delete_one(self, id_data: int) -> int:
         try:
             find_id = await self.session.get(self.model, id_data)
+
             if find_id:
                 stmt = delete(self.model).where(self.model.id == id_data).returning(self.model.id)
                 result = await self.session.execute(stmt)
                 await self.session.commit()
                 return result.scalar_one()
 
-            raise CustomException(exception="Id is not found").http_error_400
+            raise HttpAPIException(exception="id is not found").http_error_400
 
         except ConnectionError:
-            raise CustomException(exception=self.error_bd).http_error_500
+            raise HttpAPIException(exception=self.error_500_by_bd).http_error_500
 
     async def update_one(self, id_data: int, new_data: dict[str, Any]) -> dict[str, Any]:
         try:
             find_id = await self.session.get(self.model, id_data)
+
             if find_id:
                 stmt = update(self.model).where(self.model.id == id_data).values(new_data)
                 await self.session.execute(stmt)
                 await self.session.commit()
                 return new_data
 
-            raise CustomException(exception="Id is not found").http_error_400
+            raise HttpAPIException(exception="id is not found").http_error_400
 
         except ConnectionError:
-            raise CustomException(exception=self.error_bd).http_error_500
+            raise HttpAPIException(exception=self.error_500_by_bd).http_error_500
 
     #
     # async def find_by_param_limit(self,

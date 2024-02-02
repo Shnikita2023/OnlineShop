@@ -4,7 +4,7 @@ from pydantic import EmailStr
 from sqlalchemy import select, Result, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 from app.api_v1.users import UserShow
 from app.api_v1.users.models import User
 from app.api_v1.users.schemas import UserCreate
@@ -22,7 +22,7 @@ class UserDatabase:
             return user.to_read_model()
 
         except ConnectionError:
-            raise CustomException(exception=cls.error_bd).http_error_500
+            raise HttpAPIException(exception=cls.error_bd).http_error_500
 
     @classmethod
     async def get_user_by_email(cls, session: AsyncSession, email: EmailStr) -> User | None:
@@ -33,7 +33,7 @@ class UserDatabase:
             return user
 
         except ConnectionError:
-            raise CustomException(exception=cls.error_bd).http_error_500
+            raise HttpAPIException(exception=cls.error_bd).http_error_500
 
     @classmethod
     async def get_user_by_id(cls, session: AsyncSession, user_id: int) -> User | None:
@@ -44,7 +44,7 @@ class UserDatabase:
             return user
 
         except ConnectionError:
-            raise CustomException(exception=cls.error_bd).http_error_500
+            raise HttpAPIException(exception=cls.error_bd).http_error_500
 
     @classmethod
     async def update_partially_data_user(cls,
@@ -58,7 +58,7 @@ class UserDatabase:
             return new_data
 
         except ConnectionError:
-            raise CustomException(exception=cls.error_bd).http_error_500
+            raise HttpAPIException(exception=cls.error_bd).http_error_500
 
 
 user_db = UserDatabase()

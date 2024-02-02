@@ -4,7 +4,7 @@ import jwt
 from fastapi import Depends, Response
 
 from app.api_v1.auth.cookie_token_service import cookie_helper
-from app.api_v1.exceptions import CustomException
+from app.api_v1.exceptions import HttpAPIException
 from app.api_v1.users.schemas import UserCreate
 from app.config import settings
 
@@ -76,8 +76,9 @@ class TokenWork(TokenService):
                              refresh_token_payload: dict) -> str | None:
         expire_access_token = datetime.fromtimestamp(access_token_payload["exp"])
         expire_refresh_token = datetime.fromtimestamp(refresh_token_payload["exp"])
+
         if expire_access_token <= datetime.now() and expire_refresh_token <= datetime.now():
-            raise CustomException(exception="invalid token").http_error_401
+            raise HttpAPIException(exception="invalid token").http_error_401
 
         if expire_access_token <= datetime.now():
             return cls.create_new_access_token(access_token_payload)
@@ -93,9 +94,10 @@ class TokenWork(TokenService):
             access_token_payload: dict = cls.decode_jwt(token=access_token)
             refresh_token_payload: dict = cls.decode_jwt(token=refresh_token)
             new_token: str | None = cls.check_expires_tokens(access_token_payload, refresh_token_payload)
+
             if new_token:
                 cookie_helper.create_cookie_for_tokens(response, new_token, refresh_token)
             return access_token_payload
 
         except jwt.InvalidTokenError:
-            raise CustomException(exception="invalid token").http_error_401
+            raise HttpAPIException(exception="invalid token").http_error_401
