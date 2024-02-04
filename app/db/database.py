@@ -23,7 +23,8 @@ async_session_maker: async_sessionmaker[AsyncSession] = async_sessionmaker(engin
                                                                            class_=AsyncSession,
                                                                            expire_on_commit=False)
 
-pool_redis: ConnectionPool = redis.ConnectionPool.from_url(url=f"redis://localhost:6000",
+pool_redis: ConnectionPool = redis.ConnectionPool.from_url(url=f"redis://{settings.redis.REDIS_HOST}:"
+                                                               f"{settings.redis.REDIS_PORT}",
                                                            encoding="utf8",
                                                            decode_responses=True)
 

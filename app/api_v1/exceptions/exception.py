@@ -14,7 +14,7 @@ class HttpAPIException(Exception):
 
     @property
     def http_error_500(self):
-        loger.error(self.exception + " Status 500")
+        loger.error(self.exception + " Status: 500")
         return HTTPException(status_code=500, detail={
             "status": "error",
             "data": f"{datetime.now()}",
@@ -23,7 +23,7 @@ class HttpAPIException(Exception):
 
     @property
     def http_error_400(self):
-        loger.info(self.exception + " Status 400")
+        loger.info(self.exception + " Statu: 400")
         return HTTPException(status_code=400, detail={
             "status": "error",
             "data": f"{datetime.now()}",
@@ -32,7 +32,7 @@ class HttpAPIException(Exception):
 
     @property
     def http_error_401(self):
-        loger.info(self.exception + " Status 401")
+        loger.info(self.exception + " Status: 401")
         return HTTPException(status_code=401, detail={
             "status": "error",
             "data": f"{datetime.now()}",
@@ -41,7 +41,7 @@ class HttpAPIException(Exception):
 
     @property
     def http_error_403(self):
-        loger.info(self.exception + " Status 403")
+        loger.info(self.exception + " Status: 403")
         return HTTPException(status_code=403, detail={
             "status": "error",
             "data": f"{datetime.now()}",

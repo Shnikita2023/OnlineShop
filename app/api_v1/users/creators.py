@@ -22,7 +22,7 @@ class UserCreator:
 
     @staticmethod
     async def _on_after_register(user: UserShow) -> None:
-        await send_letter_on_after_register(email=user.email)
+        send_letter_on_after_register.delay(email=user.email)
         logger.info(f"Успешная отправка письма о регистрации на email '{user.email}'")
 
 

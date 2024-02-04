@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, Response, status
-from fastapi_cache.decorator import cache
 from redis.asyncio.client import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 

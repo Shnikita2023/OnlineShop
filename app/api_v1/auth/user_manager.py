@@ -22,6 +22,7 @@ class UserManager:
         if existing_user is not None:
             error_message = "Данный пользователь уже зарегистрирован, выберите другой email."
             raise HttpAPIException(error_message).http_error_400
+
         return await user_creator.create_user(user_data, session)
 
 

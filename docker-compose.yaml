@@ -21,7 +21,7 @@ services:
       - custom
 
   database:
-    image: postgres
+    image: postgres:latest
     restart: always
     container_name: "database_online_shop"
     volumes:
@@ -34,7 +34,7 @@ services:
       - custom
 
   database_test:
-    image: postgres
+    image: postgres:latest
     restart: always
     container_name: "database_online_shop_test"
     volumes:
@@ -49,7 +49,7 @@ services:
       - custom
 
   redis_app:
-    image: redis
+    image: redis:latest
     restart: always
     env_file:
       - .env
@@ -59,7 +59,43 @@ services:
     networks:
       - custom
 
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: "celery_shop"
+    depends_on:
+      - redis_app
+      - database
+      - database_test
+    volumes:
+      - ./:/app
+      - .env:/app/.env:ro
+    env_file:
+      - .env
+    networks:
+      - custom
+
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: "flower_shop"
+    depends_on:
+      - redis_app
+      - database
+      - database_test
+    ports:
+      - "5555:5555"
+    networks:
+      - custom
+
+
 networks:
   custom:
     driver: bridge
+
+
+
+
 

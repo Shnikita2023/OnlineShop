@@ -17,8 +17,10 @@ class CookieTokenHelper:
 
     @classmethod
     def get_cookie_tokens(cls, cookie_tokens: str = Cookie(alias=COOKIE_SESSION_KEY, default=None)) -> str:
+
         if cookie_tokens:
             return cookie_tokens
+
         raise HttpAPIException(exception="invalid cookie").http_error_401
 
     @classmethod

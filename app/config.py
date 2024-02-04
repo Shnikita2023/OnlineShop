@@ -49,6 +49,11 @@ class RedisSettings(BaseSettings):
     REDIS_PORT: int = os.getenv("REDIS_PORT")
 
 
+class CelerySettings(BaseSettings):
+    CELERY_BROKER_URL: str = os.getenv("CELERY_BROKER_URL")
+    CELERY_RESULT_BACKEND: str = os.getenv("CELERY_RESULT_BACKEND")
+
+
 class SessionCookie(BaseSettings):
     COOKIE_SESSION_KEY: str = os.getenv("COOKIE_SESSION_KEY")
     COOKIE_SESSION_TIME: int = os.getenv("COOKIE_SESSION_TIME")
@@ -73,6 +78,7 @@ class Settings:
     redis: RedisSettings = RedisSettings()
     session_cookie: SessionCookie = SessionCookie()
     sentry_dsn: SentryAPI = SentryAPI()
+    celery: CelerySettings = CelerySettings()
 
 
 settings = Settings()

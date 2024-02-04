@@ -18,3 +18,7 @@ COPY . .
 RUN chmod a+x docker_script/*.sh
 
 CMD ["./docker_script/app.sh"]
+
+
+
+

@@ -1,8 +1,9 @@
 import sentry_sdk
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-from fastapi.middleware.cors import CORSMiddleware
 
 from app.api_v1 import router as router_v1
 from app.config import settings

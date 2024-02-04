@@ -50,6 +50,7 @@ async def get_products(session: AsyncSession = Depends(get_async_session)) -> li
 async def create_product(product_data: ProductCreate,
                          session: AsyncSession = Depends(get_async_session),
                          user: dict = Depends(AuthUser.get_current_auth_user)) -> dict:
+
     if user["is_superuser"] is True:
         number_product: int = await product_service.add_product(session=session, product_data=product_data)
         return {
@@ -68,6 +69,7 @@ async def delete_product(
         product_id: int,
         session: AsyncSession = Depends(get_async_session),
         user: dict = Depends(AuthUser.get_current_auth_user)) -> None:
+
     if user["is_superuser"] is True:
         await product_service.delete_product(id_product=product_id, session=session)
         return None
@@ -83,6 +85,7 @@ async def update_product(
         product_update: ProductUpdate,
         session: AsyncSession = Depends(get_async_session),
         user: dict = Depends(AuthUser.get_current_auth_user)) -> dict[str, Any]:
+
     if user["is_superuser"] is True:
         return await product_service.update_product(id_product=product_id,
                                                     session=session,
