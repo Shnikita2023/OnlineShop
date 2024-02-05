@@ -10,7 +10,7 @@ from .constants import (FAILED_ERROR_LOGIN, PASSWORD_LENGTH_ERROR, STATUS_CODE_4
                         PASSWORD_UPPERCASE_ERROR, PASSWORD_LOWERCASE_ERROR, PASSWORD_DIGIT_ERROR,
                         USERNAME_ERROR, IS_SUPERUSER_ERROR, IS_VERIFIED_ERROR, PASSWORD_SPECIAL_CHAR_ERROR)
 
-logger = MyLogger(pathname=__name__).init
+logger = MyLogger(pathname=__name__).init_logger
 
 
 class EmailUser(BaseModel):

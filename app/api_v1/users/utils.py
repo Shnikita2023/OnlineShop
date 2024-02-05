@@ -1,6 +1,5 @@
 import secrets
 
-from celery.result import AsyncResult
 from redis.asyncio.client import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -33,12 +32,9 @@ class PasswordForgot:
             await self.set_token_by_redis(user_id=user.id,
                                           token=token,
                                           redis_client=self.redis_client)
-            result_task_send_email: AsyncResult = send_password_reset_email.delay(email=user.email, token=token)
 
-            if result_task_send_email.ready():
-                return {"message": "На ваш email отправлена ссылка на сброс пароля"}
-
-            raise HttpAPIException(exception="Error run task by send message on email").http_error_500
+            await send_password_reset_email(email=user.email, token=token)
+            return {"message": "На ваш email отправлена ссылка на сброс пароля"}
 
         raise HttpAPIException(exception="check the correctness your email").http_error_400
 

@@ -10,7 +10,7 @@ from app.api_v1.users.models import User
 from app.db import get_async_session
 from app.logging_config import MyLogger
 
-logger = MyLogger(pathname=__name__).init
+logger = MyLogger(pathname=__name__).init_logger
 
 
 class AuthUser:

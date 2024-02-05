@@ -1,8 +1,12 @@
 venv/
 __pycache__/
 .env
+.env.dev
 .idea/
 app.log
+celery.log
 certs/
 pg_data/
+pg_data_dev/
+.pytest_cache
 .vscode/
