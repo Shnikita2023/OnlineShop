@@ -13,7 +13,7 @@ class Product(Base):
     quantity: Mapped[int] = mapped_column(default=0)
     name_image: Mapped[str] = mapped_column(unique=True)
 
-    category_id: Mapped[int] = mapped_column(ForeignKey(column="categories.id", ondelete="CASCADE"))
+    category_id: Mapped[int] = mapped_column(ForeignKey(column="category.id", ondelete="CASCADE"))
     category = relationship(argument="Category", back_populates="products")
 
     cart_items = relationship(argument="CartItem", back_populates="products")

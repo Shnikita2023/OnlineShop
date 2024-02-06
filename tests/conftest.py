@@ -42,6 +42,6 @@ client: TestClient = TestClient(app)
 
 @pytest.fixture(scope="session")
 async def async_client() -> AsyncGenerator[AsyncClient, None]:
-    """Фикстура для создание асинхронного клиента"""
+    """Фикстура для создания асинхронного клиента"""
     async with AsyncClient(app=app, base_url="http://test") as async_client:
         yield async_client

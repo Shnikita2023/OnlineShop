@@ -43,6 +43,8 @@ build-backend = "poetry.core.masonry.api"
 addopts = "-p no:warnings"
 pythonpath = [".", "app"]
 asyncio_mode = "auto"
+env_files = ".env.dev"
+
 
 [tool.flake8]
 exclude = [
