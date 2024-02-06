@@ -50,13 +50,10 @@
     # Extract the publick key from the key pair, which can be used in a certificate
     openssl rsa -in jwt-private.pem -outform PEM -pubout -out jwt-public.pem
 
-##### 9) Запустить контейнеры с базами данными через docker
+##### 9) Запустить контейнеры через docker
 
     docker-compose up -d
 
-##### 10) Запустить сервер uvicorn 
-
-    uvicorn app.main:app --reload
 
 
 

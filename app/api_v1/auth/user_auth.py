@@ -30,7 +30,7 @@ class AuthUser:
         if email != user.email:
             raise HttpAPIException(exception=error).http_error_401
 
-        if not password_service.validate_password(password=password, hashed_password=user.password):
+        if not password_service.check_password(password=password, hashed_password=user.password):
             raise HttpAPIException(exception=error).http_error_401
 
         logger.info(f"Успешно пройдена валидация пользователя '{user.username}'. Status: 200")

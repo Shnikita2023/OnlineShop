@@ -1,6 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, status
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_v1.auth import AuthUser
@@ -39,6 +40,7 @@ async def get_product_by_product(product_value: Any,
             summary='Получение всех продуктов',
             response_model=list[ProductShow]
             )
+@cache(expire=60)
 async def get_products(session: AsyncSession = Depends(get_async_session)) -> list[ProductShow]:
     return await product_service.get_products(session=session)
 

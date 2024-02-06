@@ -27,7 +27,7 @@ class CategoryService:
         if category:
             return CategoryShow(**category)
 
-        raise HttpAPIException(exception="id category is not found").http_error_400
+        raise HttpAPIException(exception="id categories is not found").http_error_400
 
     @staticmethod
     async def delete_category(id_category: int, session: AsyncSession) -> int:

@@ -11,6 +11,7 @@ logger = MyLogger(pathname=__name__).init_logger
 
 
 # TODO Разделить логику подключение и отправки сообщение, пока сложности с передачей контекста меденежра
+
 class EmailSender:
     def __init__(self):
         self.smtp_hostname = settings.email.SMTP_HOST

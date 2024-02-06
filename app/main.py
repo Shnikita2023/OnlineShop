@@ -1,25 +1,25 @@
-import sentry_sdk
-
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 
 from app.api_v1 import router as router_v1
-from app.config import settings
 from app.db.database import get_async_redis_client
 
 
-async def startup() -> None:
-    """Подключение редиса при старте"""
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     async for redis_client in get_async_redis_client():
         FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
+    yield
 
 
-app = FastAPI(on_startup=[startup],
-              docs_url="/api/docs",
-              debug=True,
-              title="FastAPI OnlineShop")
+app = FastAPI(
+    lifespan=lifespan,
+    docs_url="/api/docs",
+    debug=True,
+    title="FastAPI OnlineShop")
 
 app.include_router(router_v1, prefix="/api/v1")
 
@@ -32,8 +32,8 @@ app.add_middleware(
                    "Authorization"],
 )
 
-sentry_sdk.init(
-    dsn=settings.sentry_dsn.SENTRY_DSN,
-    traces_sample_rate=1.0,
-    profiles_sample_rate=1.0,
-)
+# sentry_sdk.init(
+#     dsn=settings.sentry_dsn.SENTRY_DSN,
+#     traces_sample_rate=1.0,
+#     profiles_sample_rate=1.0,
+# )

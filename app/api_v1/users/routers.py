@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, BackgroundTasks, Response, status
 from redis.asyncio.client import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,8 +21,9 @@ router = APIRouter(prefix="/auth",
              status_code=status.HTTP_201_CREATED,
              response_model=UserShow)
 async def register_user(user_data: UserCreate,
-                        session: AsyncSession = Depends(get_async_session)) -> UserShow:
-    return await user_manager.create(user_data=user_data, session=session)
+                        background_tasks: BackgroundTasks,
+                        session: AsyncSession = Depends(get_async_session),) -> UserShow:
+    return await user_manager.create(user_data=user_data, session=session, background_tasks=background_tasks)
 
 
 @router.post(path="/login",
