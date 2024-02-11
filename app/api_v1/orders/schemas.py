@@ -22,7 +22,7 @@ class OrderItemCreate(BaseModel):
     quantity: int
     address: str
     price: float
-    total_price: float | None = None
+    total_price: float
     order_id: int
     product_id: int
 

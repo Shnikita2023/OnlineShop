@@ -19,19 +19,13 @@ class AuthUser:
     async def validate_auth_user(session: AsyncSession = Depends(get_async_session),
                                  email: EmailStr = Form(),
                                  password: str = Form()) -> User:
+        user: User | None = await UserValidator.validate_user_data_by_field(session=session,
+                                                                            field="email",
+                                                                            value=email)
 
-        user: User | None = await UserValidator.validate_user_data_by_email(session=session,
-                                                                            user_email=email)
-        error = "invalid username or password"
-
-        if not user:
-            raise HttpAPIException(exception=error).http_error_401
-
-        if email != user.email:
-            raise HttpAPIException(exception=error).http_error_401
-
-        if not password_service.check_password(password=password, hashed_password=user.password):
-            raise HttpAPIException(exception=error).http_error_401
+        if not user or email != user.email or not password_service.check_password(password=password,
+                                                                                  hashed_password=user.password):
+            raise HttpAPIException(exception="invalid username or password").http_error_401
 
         logger.info(f"Успешно пройдена валидация пользователя '{user.username}'. Status: 200")
         return user
@@ -41,8 +35,8 @@ class AuthUser:
                                     payload: dict = Depends(TokenWork.get_current_token_payload),
                                     session: AsyncSession = Depends(get_async_session)) -> dict:
         user_id: int = payload.get("sub")
-        user: User | None = await UserValidator.validate_user_data_by_id(user_id=user_id,
-                                                                         session=session)
+        user: User | None = await UserValidator.validate_user_data_by_field(session=session,
+                                                                            value=user_id)
         if user_id == user.id:
             logger.info(f"Получение данных о пользователе '{user.username}'. Status: 200")
             return payload

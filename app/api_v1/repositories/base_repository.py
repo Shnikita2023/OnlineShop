@@ -3,6 +3,7 @@ from typing import Any, Optional
 
 from sqlalchemy import insert, select, delete, update
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_v1.exceptions import HttpAPIException
@@ -37,10 +38,6 @@ class AbstractRepository(ABC):
     async def find_by_param(self, param_column, value):
         raise NotImplementedError
 
-    # @abstractmethod
-    # async def find_by_param_limit(self, param_column, value, index, count):
-    #     raise NotImplementedError
-
 
 class SQLAlchemyRepository(AbstractRepository):
     model = None
@@ -58,6 +55,9 @@ class SQLAlchemyRepository(AbstractRepository):
 
         except ConnectionError:
             raise HttpAPIException(exception=self.error_500_by_bd).http_error_500
+
+        except IntegrityError:
+            raise HttpAPIException(exception="duplicate entry").http_error_400
 
     async def find_all(self) -> list[dict[str, Any]]:
         try:
@@ -130,33 +130,3 @@ class SQLAlchemyRepository(AbstractRepository):
 
         except ConnectionError:
             raise HttpAPIException(exception=self.error_500_by_bd).http_error_500
-
-    #
-    # async def find_by_param_limit(self,
-    #                               param_column: str,
-    #                               value: Any,
-    #                               index: int,
-    #                               count: int) -> list[model]:
-    #     try:
-    #         stmt = (select(self.model).where(getattr(self.model, param_column) == value).
-    #                 offset(index).limit(count))
-    #         res = await self.session.execute(stmt)
-    #         res = [row[0].to_read_model() for row in res.all()]
-    #         return res
-    #
-    #     except ConnectionError:
-    #         raise Exception("Ошибка подключения к базе данных")
-    #
-    #     except InvalidRequestError:
-    #         raise Exception("Некорректный запрос, проверьте формат данных")
-    #
-    #     except Exception as ex:
-    #         raise f"Ошибка {ex}"
-    #
-
-    #
-    #     except InvalidRequestError:
-    #         raise Exception("Некорректный запрос, проверьте формат данных")
-    #
-    #     except Exception as ex:
-    #         raise f"Ошибка {ex}"

@@ -23,7 +23,7 @@ class HttpAPIException(Exception):
 
     @property
     def http_error_400(self):
-        loger.info(self.exception + " Statu: 400")
+        loger.info(self.exception + " Status: 400")
         return HTTPException(status_code=400, detail={
             "status": "error",
             "data": f"{datetime.now()}",

@@ -15,6 +15,9 @@ class Category(Base):
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
-    products = relationship(argument="Product", back_populates="category")
+    products: Mapped["Product"] = relationship(back_populates="category")
+
+    def __str__(self):
+        return self.name
 
 

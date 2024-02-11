@@ -12,4 +12,7 @@ class Profile(Base):
     bio: Mapped[str | None]
 
     user_id: Mapped[int] = mapped_column(ForeignKey(column="user.id", ondelete="CASCADE"), unique=True)
-    user = relationship(argument="User", back_populates="profile")
+    user: Mapped["User"] = relationship(back_populates="profile")
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"

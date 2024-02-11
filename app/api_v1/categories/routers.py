@@ -29,7 +29,6 @@ async def get_category(category_id: int,
             summary='Получение всех категории товаров',
             response_model=list[CategoryShow]
             )
-@cache(expire=600)
 async def get_categories(session: AsyncSession = Depends(get_async_session)) -> list[CategoryShow]:
     return await category_service.get_categories(session=session)
 

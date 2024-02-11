@@ -37,8 +37,6 @@ services:
     image: postgres:latest
     restart: always
     container_name: "database_online_shop_test"
-    volumes:
-      - ./pg_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=shop_db_test
@@ -56,6 +54,17 @@ services:
     container_name: "redis_online_shop"
     ports:
       - "6000:6379"
+    networks:
+      - custom
+
+  redis_app_test:
+    image: redis:latest
+    restart: always
+    env_file:
+      - .env
+    container_name: "redis_online_shop_test"
+    ports:
+      - "6001:6379"
     networks:
       - custom
 

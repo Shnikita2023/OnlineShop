@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).parent.parent
 
-load_dotenv(".env.dev")
+load_dotenv()
 
 
 class DbSettings(BaseSettings):
@@ -47,6 +47,9 @@ class EmailSettings(BaseSettings):
 class RedisSettings(BaseSettings):
     REDIS_HOST: str = os.getenv("REDIS_HOST")
     REDIS_PORT: int = os.getenv("REDIS_PORT")
+
+    REDIS_HOST_TEST: str = os.getenv("REDIS_HOST_TEST")
+    REDIS_PORT_TEST: int = os.getenv("REDIS_PORT_TEST")
 
 
 class CelerySettings(BaseSettings):

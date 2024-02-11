@@ -14,37 +14,37 @@ class TokenService:
     Класс для кодирования/декодирование jwt токена
     """
 
-    ACCESS_TOKEN_EXPIRE_MINUTE = settings.auth_jwt.ACCESS_TOKEN_EXPIRE_MINUTE
-    REFRESH_TOKEN_EXPIRE_MINUTE = settings.auth_jwt.REFRESH_TOKEN_EXPIRE_MINUTE
-    PRIVATE_KEY = settings.auth_jwt.PRIVATE_KEY.read_text()
-    PUBLIC_KEY = settings.auth_jwt.PUBLIC_KEY.read_text()
-    ALGORITHM = settings.auth_jwt.ALGORITHM
+    ACCESS_TOKEN_EXPIRE_MINUTE: int = settings.auth_jwt.ACCESS_TOKEN_EXPIRE_MINUTE
+    REFRESH_TOKEN_EXPIRE_MINUTE: int = settings.auth_jwt.REFRESH_TOKEN_EXPIRE_MINUTE
+    PRIVATE_KEY: str = settings.auth_jwt.PRIVATE_KEY.read_text()
+    PUBLIC_KEY: str = settings.auth_jwt.PUBLIC_KEY.read_text()
+    ALGORITHM: str = settings.auth_jwt.ALGORITHM
 
     @classmethod
-    def encode_jwt(cls, payload: dict):
+    def encode_jwt(cls, payload: dict) -> str:
 
         if len(payload) > 1:
             expire_minutes = cls.ACCESS_TOKEN_EXPIRE_MINUTE
         else:
             expire_minutes = cls.REFRESH_TOKEN_EXPIRE_MINUTE
 
-        to_encode = payload.copy()
-        now_time = datetime.utcnow()
-        expire_token = now_time + timedelta(minutes=expire_minutes)
+        to_encode: dict = payload.copy()
+        now_time: datetime = datetime.utcnow()
+        expire_token: datetime = now_time + timedelta(minutes=expire_minutes)
         to_encode.update(exp=expire_token, iat=now_time)
-        encoded = jwt.encode(payload=to_encode, key=cls.PRIVATE_KEY, algorithm=cls.ALGORITHM)
+        encoded: str = jwt.encode(payload=to_encode, key=cls.PRIVATE_KEY, algorithm=cls.ALGORITHM)
         return encoded
 
     @classmethod
-    def decode_jwt(cls, token: bytes | str):
+    def decode_jwt(cls, token: bytes | str) -> dict:
         try:
-            decoded = jwt.decode(jwt=token, key=cls.PUBLIC_KEY, algorithms=[cls.ALGORITHM])
+            decoded: dict = jwt.decode(jwt=token, key=cls.PUBLIC_KEY, algorithms=[cls.ALGORITHM])
 
         except jwt.ExpiredSignatureError:
-            decoded = jwt.decode(jwt=token,
-                                 key=cls.PUBLIC_KEY,
-                                 algorithms=[cls.ALGORITHM],
-                                 options={"verify_exp": False})
+            decoded: dict = jwt.decode(jwt=token,
+                                       key=cls.PUBLIC_KEY,
+                                       algorithms=[cls.ALGORITHM],
+                                       options={"verify_exp": False})
         return decoded
 
 
@@ -97,6 +97,7 @@ class TokenWork(TokenService):
 
             if new_token:
                 cookie_helper.create_cookie_for_tokens(response, new_token, refresh_token)
+
             return access_token_payload
 
         except jwt.InvalidTokenError:

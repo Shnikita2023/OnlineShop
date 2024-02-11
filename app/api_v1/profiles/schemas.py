@@ -1,8 +1,8 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ProfileCreate(BaseModel):
-    user_id: int
+    user_id: int = Field(default=1)
     first_name: str | None
     last_name: str | None
     bio: str | None

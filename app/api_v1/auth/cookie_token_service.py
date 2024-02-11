@@ -17,6 +17,7 @@ class CookieTokenHelper:
 
     @classmethod
     def get_cookie_tokens(cls, cookie_tokens: str = Cookie(alias=COOKIE_SESSION_KEY, default=None)) -> str:
+
         if cookie_tokens:
             return cookie_tokens
 
@@ -33,7 +34,7 @@ class CookieTokenHelper:
             "access_token": access_token,
             "refresh_token": refresh_token
         }
-        json_data_token = json.dumps(tokens)
+        json_data_token: str = json.dumps(tokens)
         response.set_cookie(cls.COOKIE_SESSION_KEY,
                             json_data_token,
                             expires=expires_cookie,

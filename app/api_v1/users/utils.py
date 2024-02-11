@@ -25,8 +25,10 @@ class PasswordForgot:
         self.redis_client = redis_client
 
     async def forgot_password_user(self) -> dict:
-        user: User | None = await UserValidator.validate_user_data_by_email(session=self.session,
-                                                                            user_email=self.user_email)
+        user: User | None = await UserValidator.validate_user_data_by_field(session=self.session,
+                                                                            field="email",
+                                                                            value=self.user_email)
+
         if user:
             token: str = await TokenGenerator.generate_temporary_token()
             await self.set_token_by_redis(user_id=user.id,

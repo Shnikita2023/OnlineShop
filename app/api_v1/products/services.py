@@ -2,6 +2,7 @@ from typing import Any, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api_v1.categories.services import category_service
 from app.api_v1.exceptions import HttpAPIException
 from app.api_v1.products.repository import ProductRepository
 from app.api_v1.products.schemas import ProductCreate, ProductUpdate
@@ -11,6 +12,8 @@ class ProductService:
 
     @staticmethod
     async def add_product(product_data: ProductCreate, session: AsyncSession) -> int:
+        await category_service.get_category(id_category=product_data.category_id,
+                                            session=session)
         product_dict: dict[str, Any] = product_data.model_dump()
         return await ProductRepository(session=session).add_one(data=product_dict)
 
@@ -21,8 +24,10 @@ class ProductService:
     @staticmethod
     async def get_product(id_product: int, session: AsyncSession) -> Optional[dict]:
         product = await ProductRepository(session=session).find_one(id_data=id_product)
+
         if product:
             return product
+
         raise HttpAPIException(exception="product is not found").http_error_400
 
     @staticmethod
@@ -33,6 +38,7 @@ class ProductService:
                                                                              param_value=product_value)
         if product:
             return product
+
         raise HttpAPIException(exception="product is not found").http_error_400
 
     @staticmethod

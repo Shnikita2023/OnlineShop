@@ -6,7 +6,7 @@ from app.config import settings
 from app.logging_config import MyLogger
 
 logger = MyLogger(pathname=__name__, name_logger="celery", filename="celery.log").init_logger
-# TODO внедрить celery в приложение
+
 celery = Celery(__name__,
                 broker=settings.celery.CELERY_BROKER_URL,
                 backend=settings.celery.CELERY_RESULT_BACKEND)

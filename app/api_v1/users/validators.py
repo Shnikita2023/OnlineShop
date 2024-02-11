@@ -1,8 +1,8 @@
-from typing import Optional
+from typing import Optional, Any
 
-from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api_v1.exceptions import HttpAPIException
 from app.api_v1.users.database import user_db
 from app.api_v1.users.models import User
 
@@ -13,15 +13,19 @@ class UserValidator:
     """
 
     @staticmethod
-    async def validate_user_data_by_email(user_email: EmailStr,
-                                          session: AsyncSession) -> Optional[User]:
-        existing_user: User | None = await user_db.get_user_by_email(session=session,
-                                                                     email=user_email)
-        return existing_user
+    async def validate_user_data_by_field(session: AsyncSession,
+                                          value: Any,
+                                          field: str | tuple = "id") -> Optional[User]:
+        error_message = "Данный пользователь уже зарегистрирован, выберите другой"
 
-    @staticmethod
-    async def validate_user_data_by_id(user_id: int,
-                                       session: AsyncSession) -> Optional[User]:
-        existing_user: User | None = await user_db.get_user_by_id(session=session,
-                                                                  user_id=user_id)
-        return existing_user
+        if type(field) == str:
+            return await user_db.get_user_by_field(session=session, column=field, value=value)
+
+        for i in range(len(field)):
+            existing_user: User | None = await user_db.get_user_by_field(session=session,
+                                                                         column=field[i],
+                                                                         value=value[i])
+            if existing_user is not None:
+                raise HttpAPIException(f"{error_message} {field[i]}.").http_error_400
+
+        return None

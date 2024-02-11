@@ -14,8 +14,10 @@ class Product(Base):
     name_image: Mapped[str] = mapped_column(unique=True)
 
     category_id: Mapped[int] = mapped_column(ForeignKey(column="category.id", ondelete="CASCADE"))
-    category = relationship(argument="Category", back_populates="products")
+    category: Mapped["Category"] = relationship(back_populates="products")
 
-    cart_items = relationship(argument="CartItem", back_populates="products")
-    order_items = relationship(argument="OrderItem", back_populates="products")
+    cart_item: Mapped["CartItem"] = relationship(back_populates="product")
+    order_item: Mapped["OrderItem"] = relationship(back_populates="product")
 
+    def __str__(self):
+        return self.name

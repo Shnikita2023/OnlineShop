@@ -22,7 +22,7 @@ router = APIRouter(prefix="/auth",
              response_model=UserShow)
 async def register_user(user_data: UserCreate,
                         background_tasks: BackgroundTasks,
-                        session: AsyncSession = Depends(get_async_session),) -> UserShow:
+                        session: AsyncSession = Depends(get_async_session)) -> UserShow:
     return await user_manager.create(user_data=user_data, session=session, background_tasks=background_tasks)
 
 

@@ -14,7 +14,7 @@ class MyLogger:
     @property
     def init_logger(self):
         logging.basicConfig(
-            level=logging.DEBUG,
+            level=logging.INFO,
             format=f"%(asctime)s :: %(levelname)s :: {self.pathname}:%(lineno)d - %(message)s",
             handlers=[
                 logging.FileHandler(filename=self.filename, mode="w", encoding="utf-8"),

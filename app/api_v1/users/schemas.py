@@ -14,7 +14,7 @@ logger = MyLogger(pathname=__name__).init_logger
 
 
 class EmailUser(BaseModel):
-    email: str = Field(default="user@mail.ru")
+    email: str
 
     @field_validator("email")
     def validate_email(cls, email):
