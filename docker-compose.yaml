@@ -15,6 +15,7 @@ services:
       - database
       - database_test
       - redis_app
+      - redis_app_test
     ports:
       - "8000:8000"
     networks:
@@ -75,6 +76,7 @@ services:
     container_name: "celery_shop"
     depends_on:
       - redis_app
+      - redis_app_test
       - database
       - database_test
     volumes:
@@ -91,9 +93,7 @@ services:
       dockerfile: Dockerfile
     container_name: "flower_shop"
     depends_on:
-      - redis_app
-      - database
-      - database_test
+      - celery
     ports:
       - "5555:5555"
     networks:

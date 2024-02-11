@@ -24,6 +24,7 @@ admin = Admin(app=app,
 
 app.include_router(router_v1, prefix="/api/v1")
 
+# Подключение view к админам панели
 for classes in admin_classes:
     admin.add_view(classes)
 
