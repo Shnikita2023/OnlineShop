@@ -14,12 +14,14 @@
 [![Sentry](https://img.shields.io/badge/-Sentry-464646?style=flat-square&logo=Sentry)](https://sentry.io/welcome/)
 [![Prometheus](https://img.shields.io/badge/-Prometheus-464646?style=flat-square&logo=Prometheus)](https://prometheus.io/)
 [![Grafana](https://img.shields.io/badge/-Grafana-464646?style=flat-square&logo=Grafana)](https://grafana.com/)
+[![Nginx](https://img.shields.io/badge/-Nginx-009639?style=flat-square&logo=Nginx)](https://www.nginx.com/)
 [![Uvicorn](https://img.shields.io/badge/-Uvicorn-464646?style=flat-square&logo=uvicorn)](https://www.uvicorn.org/)
 [![Gunicorn](https://img.shields.io/badge/-Gunicorn-464646?style=flat-square&logo=gunicorn)](https://gunicorn.org/)
 
 ### Описание проекта:
+Данное приложение можно использовать в качестве Интернет-магазина, для различного продукта
 
-Веб-приложение интернет-магазина.
+Функционал приложение:
 - JWT авторизация, аутентификация.
 - Регистрация пользователя, восстановление пароля.
 - У не аутентифицированных пользователей доступ к API только на уровне чтения.
@@ -68,8 +70,6 @@
 - Grafana == 10.3.1
 - Prometheus == 2.49
 
-
-
 ## Разработка
 
 ##### 1) Клонировать репозиторий
@@ -105,7 +105,6 @@
 ##### 10) Перейти в документацию api
 
     127.0.0.1:8000/api/docs
-
 
 ## Дополнительные шаги для запуска сторонних библиотек:
 
