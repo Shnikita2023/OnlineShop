@@ -1,19 +1,45 @@
-<h2 align="center">Online Shop</h2>
+# Cервис Online Shop
 
+[![Python](https://img.shields.io/badge/-Python-464646?style=flat-square&logo=Python)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/-FastAPI-464646?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Асинхронность](https://img.shields.io/badge/-Асинхронность-464646?style=flat-square&logo=Асинхронность)]()
+[![Cookies](https://img.shields.io/badge/-Cookies-464646?style=flat-square&logo=Cookies)]()
+[![JWT](https://img.shields.io/badge/-JWT-464646?style=flat-square&logo=JWT)]()
+[![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-464646?style=flat-square&logo=PostgreSQL)](https://www.postgresql.org/)
+[![Alembic](https://img.shields.io/badge/-Alembic-464646?style=flat-square&logo=Alembic)](https://alembic.sqlalchemy.org/en/latest/)
+[![SQLAlchemy](https://img.shields.io/badge/-SQLAlchemy-464646?style=flat-square&logo=SQLAlchemy)](https://www.sqlalchemy.org/)
+[![Docker](https://img.shields.io/badge/-Docker-464646?style=flat-square&logo=docker)](https://www.docker.com/)
+[![Redis](https://img.shields.io/badge/-Redis-464646?style=flat-square&logo=Redis)](https://redis.io/)
+[![Celery](https://img.shields.io/badge/-Celery-464646?style=flat-square&logo=Celery)](https://docs.celeryq.dev/en/stable/)
+[![Sentry](https://img.shields.io/badge/-Sentry-464646?style=flat-square&logo=Sentry)](https://sentry.io/welcome/)
+[![Prometheus](https://img.shields.io/badge/-Prometheus-464646?style=flat-square&logo=Prometheus)](https://prometheus.io/)
+[![Grafana](https://img.shields.io/badge/-Grafana-464646?style=flat-square&logo=Grafana)](https://grafana.com/)
+[![Uvicorn](https://img.shields.io/badge/-Uvicorn-464646?style=flat-square&logo=uvicorn)](https://www.uvicorn.org/)
+[![Gunicorn](https://img.shields.io/badge/-Gunicorn-464646?style=flat-square&logo=gunicorn)](https://gunicorn.org/)
 
 ### Описание проекта:
 
 Веб-приложение интернет-магазина.
-- JWT авторизация, аутентификация
-- Регистрация пользователя, восстановление пароля
-- Админ панель для более удобного взаимодействия с БД
-- CRUD профиля
-- CRUD категорий
-- CRUD корзины пользователя
-- CRUD заказов пользователя
-- CRUD продуктов
-- Отправка писем на Email
-
+- JWT авторизация, аутентификация.
+- Регистрация пользователя, восстановление пароля.
+- У не аутентифицированных пользователей доступ к API только на уровне чтения.
+- Создание объектов разрешено только аутентифицированным пользователям.
+- Возможность получения подробной информации о себе.
+- Загрузка тестовых данных в БД.
+- CRUD профиля.
+- CRUD категорий.
+- CRUD корзины пользователя.
+- CRUD заказов пользователя.
+- CRUD продуктов.
+- Отправка писем на Email.
+- Возможность администрирования сервиса.
+- Версионирование API.
+- Кеширование/брокер задач с помощью Redis.
+- Анализ и сбор метрик (Grafana, Prometheus).
+- Использование балансировщика, прокси сервера Nginx.
+- Логирование посредством кастомного логгера.
+- Мониторинг ошибок с помощью Sentry.
+- Возможность развернуть проект в Docker-контейнерах.
 
 ## To Do:
 
@@ -21,7 +47,6 @@
 - Покрыть больше кода тестами
 - Расширить функционал приложение
 - Добавить более длительную задачу для Celery (в проект уже инициализирован)
-- Внедрить визуализацию метрик, ошибок, логов через Grafana/Prometheus
 - Реализовать отдельную сущность с балансом и транзакций пользователя
 - Развернуть CI/CD на платформе GitLab
 
@@ -39,6 +64,10 @@
 - Celery == 5.3.6
 - Flower == 2.0.1
 - Sentry == 1.40.1
+- Nginx == 1.25.3
+- Grafana == 10.3.1
+- Prometheus == 2.49
+
 
 
 ## Разработка
@@ -92,6 +121,17 @@
 
     https://www.sentry.dev/for/python/
 
+##### 4) Для запуска Prometheus
+
+    127.0.0.1:9090
+
+##### 5) Для отображения метрик в красивом стиле, нужна Grafanа
+
+    127.0.0.1:3000
+
+##### 6) Перед созданием дашбордов, нужна подключить источник в Connections - Data Sources - Prometheus
+
+       Prometheus server URL: http://prometheus_shop:9090
 
 
 

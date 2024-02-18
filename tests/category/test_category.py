@@ -1,5 +1,5 @@
 import pytest
-from httpx import Response, AsyncClient
+from httpx import AsyncClient, Response
 
 
 class TestCategory:

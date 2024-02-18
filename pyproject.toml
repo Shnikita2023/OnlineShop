@@ -8,7 +8,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 uvicorn = { extras = ["standart"], version = "^0.24.0.post1" }
-fastapi = { extras = ["all"], version = "^0.104.1" }
 asyncpg = "^0.29.0"
 sqlalchemy = { extras = ["asyncio"], version = "^2.0.23" }
 alembic = "^1.13.0"
@@ -30,10 +29,17 @@ flower = "^2.0.1"
 gunicorn = "^21.2.0"
 flake8-pyproject = "^1.2.3"
 sqladmin = "^0.16.0"
+fastapi = "^0.109.2"
+starlette-exporter = "^0.21.0"
+python-dotenv = "^1.0.1"
+pydantic-settings = "^2.1.0"
+pydantic = {extras = ["email"], version = "^2.6.1"}
+itsdangerous = "^2.1.2"
+isort = "^5.13.2"
+httpx = "^0.26.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
-black = "^23.11.0"
 pytest-asyncio = "^0.23.4"
 
 [build-system]
@@ -46,7 +52,6 @@ pythonpath = [".", "app"]
 asyncio_mode = "auto"
 env_files = ".env.dev"
 
-
 [tool.flake8]
 exclude = [
     ".git",
@@ -57,10 +62,23 @@ exclude = [
     "certs",
     "docker_script",
     "pg_data",
+    "alembic",
     "app.log",
+    "conf.d",
     ".dockerignore",
     "setup.cfg",
     "README.md"
 ]
 max-line-length = 120
+ignore = ["A003", "VNE003", "I100", "I201", "B008"]
 max-complexity = 8
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+line_length = 120
+use_parentheses = true
+multi_line_output = 3
+force_single_line = true
+lines_after_imports = 2

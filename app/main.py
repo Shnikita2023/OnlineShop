@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from sqladmin import Admin
+from starlette_exporter import handle_metrics, PrometheusMiddleware
 
 from app.api_v1 import router as router_v1
 from app.api_v1.admin_panel import admin_classes
@@ -23,6 +24,7 @@ admin = Admin(app=app,
               authentication_backend=authentication_backend)
 
 app.include_router(router_v1, prefix="/api/v1")
+app.add_route("/metrics", handle_metrics)
 
 # Подключение view к админам панели
 for classes in admin_classes:
@@ -35,9 +37,11 @@ async def startup():
         FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
 
 
+app.add_middleware(PrometheusMiddleware)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins="http://localhost:3000/",
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS", "DELETE", "PATCH", "PUT"],
     allow_headers=["Content-Type", "Set-Cookie", "Access-Control-Allow-Headers", "Access-Control-Allow-Origin",

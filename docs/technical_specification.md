@@ -58,4 +58,7 @@ Fetсh/Axios запросы.
 + БД PostgreSQL
 + Redis
 + Docker
++ Nginx
++ Grafana
++ Prometheus
   

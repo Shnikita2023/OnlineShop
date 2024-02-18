@@ -2,6 +2,18 @@ version: '3.9'
 
 services:
 
+  web_nginx:
+    container_name: "web_nginx"
+    image: nginx:alpine
+    depends_on:
+      - fast_api
+    ports:
+      - "80:80"
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d
+    networks:
+      - custom
+
   fast_api:
     build:
       context: .
@@ -16,8 +28,6 @@ services:
       - database_test
       - redis_app
       - redis_app_test
-    ports:
-      - "8000:8000"
     networks:
       - custom
 
@@ -99,10 +109,44 @@ services:
     networks:
       - custom
 
+  prometheus_shop:
+    image: prom/prometheus
+    container_name: "prometheus_shop"
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    depends_on:
+      - fast_api
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - custom
+
+  grafana_shop:
+    image: grafana/grafana
+    container_name: "grafana_shop"
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - grafana-config:/etc/grafana
+    depends_on:
+      - prometheus_shop
+    networks:
+      - custom
 
 networks:
   custom:
     driver: bridge
+
+volumes:
+  grafana-data:
+  grafana-config:
+  prometheus-data:
 
 
 

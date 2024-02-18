@@ -2,7 +2,7 @@ import re
 from typing import Optional
 
 from fastapi import HTTPException
-from pydantic import BaseModel, ConfigDict, field_validator, Field
+from pydantic import BaseModel, ConfigDict, field_validator
 from starlette import status
 
 from app.logging_config import MyLogger
