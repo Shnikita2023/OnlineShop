@@ -55,6 +55,7 @@ async def create_product(product_data: ProductCreate,
 
     if user["is_superuser"] is True:
         number_product: int = await product_service.add_product(session=session, product_data=product_data)
+
         return {
             "message": f"Product creates with {number_product} number successfully",
             "data": product_data
@@ -74,6 +75,7 @@ async def delete_product(
 
     if user["is_superuser"] is True:
         await product_service.delete_product(id_product=product_id, session=session)
+
         return None
 
     raise HttpAPIException(exception="access denied.").http_error_403

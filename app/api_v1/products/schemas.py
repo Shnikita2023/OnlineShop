@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ProductCreate(BaseModel):
@@ -6,8 +6,10 @@ class ProductCreate(BaseModel):
     description: str
     price: float
     quantity: int
+    reserved_quantity: int
     name_image: str
     category_id: int
+    discount: float = Field(default=0.0)
 
 
 class ProductShow(ProductCreate):
@@ -24,4 +26,6 @@ class ProductUpdatePartial(BaseModel):
     description: str | None = None
     price: int | None = None
     quantity: int | None = None
+    reserved_quantity: int | None = None
     name_image: str | None = None
+    discount: float | None = None

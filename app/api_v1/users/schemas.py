@@ -74,7 +74,7 @@ class UserCreate(EmailUser, PasswordUser):
     @field_validator("username")
     def validate_username(cls, username):
         USERNAME_REGEX = r"^[А-ЯЁ][а-яё]+$|^[A-Z][a-z]+$"
-
+        # Проверка на корректности имени
         if not re.match(USERNAME_REGEX, username):
             logger.info(f"{FAILED_ERROR_LOGIN}\n{USERNAME_ERROR}{STATUS_CODE_400}")
             raise HTTPException(status_code=400,
@@ -83,7 +83,7 @@ class UserCreate(EmailUser, PasswordUser):
 
     @field_validator("is_superuser")
     def validate_superuser(cls, is_superuser):
-
+        # Проверка на суперпользователя
         if is_superuser is True:
             logger.info(f"{FAILED_ERROR_LOGIN}\n{IS_SUPERUSER_ERROR}{STATUS_CODE_400}")
             raise HTTPException(status_code=400, detail=IS_SUPERUSER_ERROR)
@@ -92,7 +92,7 @@ class UserCreate(EmailUser, PasswordUser):
 
     @field_validator("is_verified")
     def validate_verified(cls, is_verified):
-
+        # Проверка на верифицированность
         if is_verified is True:
             logger.info(f"{FAILED_ERROR_LOGIN}\n{IS_VERIFIED_ERROR}{STATUS_CODE_400}")
             raise HTTPException(status_code=400, detail=IS_VERIFIED_ERROR)

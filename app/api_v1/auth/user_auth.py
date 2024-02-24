@@ -14,6 +14,9 @@ logger = MyLogger(pathname=__name__).init_logger
 
 
 class AuthUser:
+    """
+    Класс для валидация пользователя
+    """
 
     @staticmethod
     async def validate_auth_user(session: AsyncSession = Depends(get_async_session),

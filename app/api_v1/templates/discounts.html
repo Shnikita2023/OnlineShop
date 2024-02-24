@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Скидки!</title>
+</head>
+<body>
+    <h1>Скидки на товары</h1>
+    <ul>
+        {% for product in products_discount %}
+            {% for name_product, price_product in product.items() %}
+                <li>{{ name_product }}, Цена {{ price_product }} рублей</li>
+            {% endfor %}
+        {% endfor %}
+    </ul>
+</body>
+</html>

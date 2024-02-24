@@ -8,6 +8,10 @@ from app.db import async_session_maker
 
 
 class AdminAuth(AuthenticationBackend):
+    """
+    Класс для создания аутентификации в админ панели
+    """
+
     async def login(self, request: Request) -> bool:
         form = await request.form()
         email, password = form["username"], form["password"]

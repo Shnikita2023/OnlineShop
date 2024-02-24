@@ -11,6 +11,10 @@ from app.api_v1.users.schemas import UserCreate
 
 
 class UserDatabase:
+    """
+    Класс для работы с базой данных пользователя
+    """
+
     error_bd = "Ошибка подключение к БД"
 
     @classmethod
@@ -27,8 +31,8 @@ class UserDatabase:
     @classmethod
     async def get_user_by_field(cls, session: AsyncSession, column: str, value: Any):
         try:
-            stmt = select(User).where(getattr(User, column) == value)
-            result: Result = await session.execute(stmt)
+            query = select(User).filter_by(**{column: value})
+            result: Result = await session.execute(query)
             user: User | None = result.scalar_one_or_none()
             return user
 
@@ -38,8 +42,8 @@ class UserDatabase:
     @classmethod
     async def get_user_by_email(cls, session: AsyncSession, email: EmailStr) -> User | None:
         try:
-            stmt = select(User).where(User.email == email)
-            result: Result = await session.execute(stmt)
+            query = select(User).where(User.email == email)
+            result: Result = await session.execute(query)
             user: User | None = result.scalar_one_or_none()
             return user
 
@@ -51,6 +55,17 @@ class UserDatabase:
         try:
             user: User | None = await session.get(User, user_id)
             return user
+
+        except ConnectionError:
+            raise HttpAPIException(exception=cls.error_bd).http_error_500
+
+    @classmethod
+    async def get_emails_users(cls, session: AsyncSession) -> list:
+        try:
+            query = select(User.email)
+            result: Result = await session.execute(query)
+            emails_users = result.scalars().all()
+            return list(emails_users)
 
         except ConnectionError:
             raise HttpAPIException(exception=cls.error_bd).http_error_500

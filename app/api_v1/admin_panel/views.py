@@ -9,7 +9,8 @@ from app.api_v1.users.models import User
 
 
 class UserAdmin(ModelView, model=User):
-    column_list = ("id", "username", "email", "is_active", "is_superuser", "is_verified", "profile", "orders", "cart")
+    column_list = ("id", "username", "email", "is_active", "is_superuser",
+                   "is_verified", "profile", "orders", "cart")
     form_columns = ("username", "email", "is_active", "is_superuser", "is_verified")
     column_details_exclude_list = [User.password]
     can_delete = False
@@ -33,7 +34,8 @@ class CategoryAdmin(ModelView, model=Category):
 
 class ProductAdmin(ModelView, model=Product):
     column_list = "__all__"
-    form_columns = ("name", "description", "price", "quantity", "name_image", "category")
+    form_columns = ("name", "description", "price", "quantity",
+                    "reserved_quantity", "discount", "name_image", "category")
     name = "Продукт"
     name_plural = "Продукты"
 
@@ -53,6 +55,7 @@ class CartItemAdmin(ModelView, model=CartItem):
 
 class OrderAdmin(ModelView, model=Order):
     column_list = "__all__"
+    form_excluded_columns = ("order_items",)
     name = "Заказ"
     name_plural = "Заказы"
 

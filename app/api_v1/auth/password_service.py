@@ -2,6 +2,9 @@ import bcrypt
 
 
 class PasswordService:
+    """
+    Сервис для кодирования/декодирование пароля
+    """
 
     @staticmethod
     def hash_password(password: str) -> bytes:
