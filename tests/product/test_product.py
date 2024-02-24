@@ -5,17 +5,18 @@ from httpx import Response, AsyncClient
 class TestProduct:
     """Класс для тестирования продукта"""
 
-    @pytest.mark.parametrize("name, description, price, quantity, name_image, discount",
+    @pytest.mark.parametrize("name, description, price, quantity, reserved_quantity, name_image, discount",
                              [
-                                 ("Iphone 9", "Диагональ 6.0", 50000.0, 30, "iphone_9", 0.2),
-                                 ("Samsung A5", "Диагональ 6.0", 20000.0, 100, "samsung_a5", 0.3),
-                                 ("Xiaomi 7a", "Диагональ 7.0", 30000.0, 40, "xiaomi_7a", 0.4)
+                                 ("Iphone 9", "Диагональ 6.0", 50000.0, 30, 1, "iphone_9", 0.2),
+                                 ("Samsung A5", "Диагональ 6.0", 20000.0, 100, 1, "samsung_a5", 0.3),
+                                 ("Xiaomi 7a", "Диагональ 7.0", 30000.0, 40, 1, "xiaomi_7a", 0.4)
                              ])
     async def test_create_product(self,
                                   name: str,
                                   description: str,
                                   price: float,
                                   quantity: int,
+                                  reserved_quantity: int,
                                   name_image: str,
                                   get_category_id: int,
                                   discount: float,
@@ -26,6 +27,7 @@ class TestProduct:
             "description": description,
             "price": price,
             "quantity": quantity,
+            "reserved_quantity": reserved_quantity,
             "name_image": name_image,
             "category_id": get_category_id,
             "discount": discount
@@ -42,7 +44,7 @@ class TestProduct:
         product = response_product.json()
 
         assert response_product.status_code == 200
-        assert len(response_product.json()) == 8
+        assert len(response_product.json()) == 9
         assert product["name"] == "Iphone 9"
         assert product["price"] == 40000.0
 
