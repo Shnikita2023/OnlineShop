@@ -33,7 +33,7 @@ class CategoryAdmin(ModelView, model=Category):
 
 class ProductAdmin(ModelView, model=Product):
     column_list = "__all__"
-    form_columns = ("name", "description", "price", "quantity", "name_image", "category")
+    form_columns = ("name", "description", "price", "quantity", "discount", "name_image", "category")
     name = "Продукт"
     name_plural = "Продукты"
 
@@ -53,6 +53,7 @@ class CartItemAdmin(ModelView, model=CartItem):
 
 class OrderAdmin(ModelView, model=Order):
     column_list = "__all__"
+    form_excluded_columns = ("order_items",)
     name = "Заказ"
     name_plural = "Заказы"
 

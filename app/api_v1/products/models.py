@@ -12,6 +12,7 @@ class Product(Base):
     description: Mapped[str | None]
     quantity: Mapped[int] = mapped_column(default=0)
     name_image: Mapped[str] = mapped_column(unique=True)
+    discount: Mapped[float] = mapped_column(default=0.0, comment="Скидка передаётся в процентах")
 
     category_id: Mapped[int] = mapped_column(ForeignKey(column="category.id", ondelete="CASCADE"))
     category: Mapped["Category"] = relationship(back_populates="products")

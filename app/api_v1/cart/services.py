@@ -31,7 +31,11 @@ class CartItemService:
                                                           user_current=user_current,
                                                           cart_id=cart_item_data.cart_id)
 
-        await product_service.get_product(id_product=cart_item_data.product_id, session=session)
+        product: dict = await product_service.get_product(id_product=cart_item_data.product_id, session=session)
+
+        if cart_item_data.quantity > product["quantity"]:
+            raise HttpAPIException(exception="there is no such quantity of products available").http_error_400
+
         cart_item_dict: dict[str, Any] = cart_item_data.model_dump()
         return await CartItemRepository(session=session).add_one(data=cart_item_dict)
 

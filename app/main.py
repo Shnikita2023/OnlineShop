@@ -23,6 +23,7 @@ admin = Admin(app=app,
               title="Админ панель",
               authentication_backend=authentication_backend)
 
+# Подключение роутеров
 app.include_router(router_v1, prefix="/api/v1")
 app.add_route("/metrics", handle_metrics)
 

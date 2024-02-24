@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).parent.parent
 
-load_dotenv(".env.dev")
+load_dotenv(BASE_DIR / ".env")
 
 
 class DbSettings(BaseSettings):

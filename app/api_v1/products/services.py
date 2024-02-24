@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_v1.categories.services import category_service
 from app.api_v1.exceptions import HttpAPIException
+from app.api_v1.products import Product
 from app.api_v1.products.repository import ProductRepository
 from app.api_v1.products.schemas import ProductCreate, ProductUpdate
 
@@ -15,11 +16,18 @@ class ProductService:
         await category_service.get_category(id_category=product_data.category_id,
                                             session=session)
         product_dict: dict[str, Any] = product_data.model_dump()
+        new_price_by_discount: float = product_dict["price"] * (1 - product_dict["discount"])
+        product_dict["price"] = new_price_by_discount
         return await ProductRepository(session=session).add_one(data=product_dict)
 
     @staticmethod
     async def get_products(session: AsyncSession) -> list[dict[str, Any]]:
         return await ProductRepository(session=session).find_all()
+
+    @staticmethod
+    async def get_products_only_discount(session: AsyncSession) -> Optional[list[Product]]:
+        return await ProductRepository(session=session).find_all_greater_than(param_column="discount",
+                                                                              param_value=0)
 
     @staticmethod
     async def get_product(id_product: int, session: AsyncSession) -> Optional[dict]:

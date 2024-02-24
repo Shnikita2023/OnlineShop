@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api_v1.exceptions import HttpAPIException
 from app.api_v1.orders import OrderCreate, OrderItemCreate, OrderItemShow, OrderUpdate, OrderShow
 from app.api_v1.orders.repository import OrderRepository, OrderItemRepository
+from app.api_v1.products.services import product_service
 
 
 class OrderService:
@@ -15,11 +16,11 @@ class OrderService:
         """Проверка существующего заказа и доступа пользователя"""
         order: Optional[dict] = await OrderRepository(session=session).find_one(id_data=order_id)
 
-        if user_current["sub"] != order["user_id"]:
-            raise HttpAPIException(exception="access denied.").http_error_403
-
         if not order:
             raise HttpAPIException(exception="order not found").http_error_400
+
+        if user_current["sub"] != order["user_id"]:
+            raise HttpAPIException(exception="access denied").http_error_403
 
         return None
 
@@ -87,6 +88,11 @@ class OrderItemService:
                                                       user_current=user_current,
                                                       order_id=order_item_data.order_id)
 
+        product: dict = await product_service.get_product(id_product=order_item_data.product_id, session=session)
+
+        if order_item_data.quantity > product["quantity"]:
+            raise HttpAPIException(exception="there is no such quantity of products available").http_error_400
+
         if not order_item_data.total_price:
             order_item_data.total_price = order_item_data.quantity * order_item_data.price
 
@@ -98,12 +104,11 @@ class OrderItemService:
     @staticmethod
     async def get_order_items(session: AsyncSession,
                               order_id: int) -> list[OrderItemShow]:
-        all_order_item_list = await OrderItemRepository(session=session).find_by_param(param_column="order_id",
-                                                                                       value=order_id)
+        all_order_item_list = await OrderItemRepository(session=session).find_all_by_param(param_column="order_id",
+                                                                                           param_value=order_id)
         schemas_order_items: list[OrderItemShow] = [OrderItemShow(**data) for data in all_order_item_list]
         return schemas_order_items
 
 
 order_service = OrderService()
 order_item_service = OrderItemService()
-

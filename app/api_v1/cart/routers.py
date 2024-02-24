@@ -72,8 +72,8 @@ async def delete_cart(user_id: int,
                       session: AsyncSession = Depends(get_async_session),
                       user: dict = Depends(AuthUser.get_current_auth_user)) -> None:
     if user_id == user["sub"]:
-        int = await cart_service.delete_cart(session=session,
-                                             user_id=user_id)
+        await cart_service.delete_cart(session=session,
+                                       user_id=user_id)
         return None
 
     raise HttpAPIException(exception="access denied.").http_error_403

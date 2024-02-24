@@ -17,7 +17,7 @@ class MyLogger:
             level=logging.INFO,
             format=f"%(asctime)s :: %(levelname)s :: {self.pathname}:%(lineno)d - %(message)s",
             handlers=[
-                # logging.FileHandler(filename=self.filename, mode="w", encoding="utf-8"),
+                logging.FileHandler(filename=self.filename, mode="w", encoding="utf-8"),
                 logging.StreamHandler()
             ]
         )
