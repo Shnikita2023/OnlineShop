@@ -42,6 +42,7 @@ class EmailSender:
             raise HttpAPIException(exception=error).http_error_500
 
     async def send_notification(self, body: str, email: EmailStr, subject: str):
+        """Отправка сообщений"""
         try:
             message = EmailMessage()
             message["From"] = settings.email.SMTP_USER

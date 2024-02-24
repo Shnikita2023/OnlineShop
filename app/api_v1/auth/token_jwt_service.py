@@ -49,7 +49,9 @@ class TokenService:
 
 
 class TokenWork(TokenService):
-    """Класс для работы с токенами пользователей"""
+    """
+    Класс для работы с токенами пользователей
+    """
 
     @classmethod
     def create_tokens(cls, user: UserCreate, response: Response) -> tuple:

@@ -10,6 +10,9 @@ from app.api_v1.products.services import product_service
 
 
 class OrderService:
+    """
+    Сервис заказов
+    """
 
     @staticmethod
     async def check_existing_user_order(session: AsyncSession, user_current: dict, order_id: int) -> None:
@@ -26,6 +29,7 @@ class OrderService:
 
     @staticmethod
     async def create_order(order_data: OrderCreate, session: AsyncSession, redis_client: Redis) -> int:
+        """Создание заказа"""
         order_dict: dict[str, Any] = order_data.model_dump()
         order_id: int = await OrderRepository(session=session).add_one(data=order_dict)
         await redis_client.set(name=f"modified_order_{order_id}", value="False")
@@ -37,7 +41,7 @@ class OrderService:
                         redis_client: Redis,
                         user_current: dict,
                         order_id: int) -> OrderShow:
-
+        """Получение заказа"""
         await order_service.check_existing_user_order(session=session, user_current=user_current, order_id=order_id)
 
         is_modified_order_id: bool = await redis_client.get(f"modified_order_{order_id}")
@@ -60,7 +64,7 @@ class OrderService:
                            order_id: int,
                            new_order: OrderUpdate,
                            user_current: dict) -> OrderUpdate:
-
+        """Обновление заказа"""
         if user_current["sub"] != new_order.user_id:
             raise HttpAPIException(exception="access denied.").http_error_403
 
@@ -72,18 +76,23 @@ class OrderService:
     async def delete_order(session: AsyncSession,
                            order_id: int,
                            user_current: dict) -> int:
+        """Удаление заказа"""
         await order_service.check_existing_user_order(session=session, user_current=user_current, order_id=order_id)
 
         return await OrderRepository(session=session).delete_one(id_data=order_id)
 
 
 class OrderItemService:
+    """
+    Сервис элементов заказа
+    """
 
     @staticmethod
     async def add_order_item(order_item_data: OrderItemCreate,
                              session: AsyncSession,
                              redis_client: Redis,
                              user_current: dict) -> int:
+        """Добавление элемента заказа"""
         await order_service.check_existing_user_order(session=session,
                                                       user_current=user_current,
                                                       order_id=order_item_data.order_id)
@@ -104,6 +113,7 @@ class OrderItemService:
     @staticmethod
     async def get_order_items(session: AsyncSession,
                               order_id: int) -> list[OrderItemShow]:
+        """Получение элемента заказа"""
         all_order_item_list = await OrderItemRepository(session=session).find_all_by_param(param_column="order_id",
                                                                                            param_value=order_id)
         schemas_order_items: list[OrderItemShow] = [OrderItemShow(**data) for data in all_order_item_list]

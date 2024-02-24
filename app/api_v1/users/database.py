@@ -11,6 +11,10 @@ from app.api_v1.users.schemas import UserCreate
 
 
 class UserDatabase:
+    """
+    Класс для работы с базой данных пользователя
+    """
+
     error_bd = "Ошибка подключение к БД"
 
     @classmethod

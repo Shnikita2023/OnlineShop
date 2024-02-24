@@ -11,7 +11,7 @@ router = APIRouter(
 
 @router.get(path="/",
             summary="Отправка скидок на товары пользователям")
-async def create_order(background_tasks: BackgroundTasks) -> dict[str, str]:
+async def send_to_discount_products(background_tasks: BackgroundTasks) -> dict[str, str]:
     background_tasks.add_task(send_to_discount_products_emails)
     return {"message": "Товары со скидками отправлены на email пользователям"}
 

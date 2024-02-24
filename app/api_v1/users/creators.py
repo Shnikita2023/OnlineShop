@@ -12,6 +12,10 @@ logger = MyLogger(pathname=__name__).init_logger
 
 
 class UserCreator:
+    """
+    Класс для создания пользователя
+    """
+
     async def create_user(self,
                           user_data: UserCreate,
                           session: AsyncSession,

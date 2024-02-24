@@ -104,7 +104,7 @@ class SQLAlchemyRepository(AbstractRepository):
             column = getattr(self.model, param_column)
             query = select(self.model).where(column > param_value)
             result = await self.session.execute(query)
-            list_models = result.scalars().all()
+            list_models = list(result.scalars().all())
             return list_models
 
         except ConnectionError:
