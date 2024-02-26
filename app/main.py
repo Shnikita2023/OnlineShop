@@ -1,4 +1,5 @@
 import sentry_sdk
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
@@ -9,6 +10,7 @@ from starlette_exporter import handle_metrics, PrometheusMiddleware
 from app.api_v1 import router as router_v1
 from app.api_v1.admin_panel import admin_classes
 from app.api_v1.admin_panel.auth import authentication_backend
+from app.api_v1.middlewares.middleware import RateLimitMiddleware
 from app.config import settings
 from app.db.database import get_async_redis_client, engine
 
@@ -23,11 +25,9 @@ admin = Admin(app=app,
               title="Админ панель",
               authentication_backend=authentication_backend)
 
-# Подключение роутеров
 app.include_router(router_v1, prefix="/api/v1")
 app.add_route("/metrics", handle_metrics)
 
-# Подключение view к админам панели
 for classes in admin_classes:
     admin.add_view(classes)
 
@@ -37,6 +37,7 @@ async def startup():
     async for redis_client in get_async_redis_client():
         FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
 
+app.add_middleware(RateLimitMiddleware)
 
 app.add_middleware(PrometheusMiddleware)
 
@@ -54,3 +55,6 @@ sentry_sdk.init(
     traces_sample_rate=1.0,
     profiles_sample_rate=1.0,
 )
+
+if __name__ == "__main__":
+    uvicorn.run(app=app, port=8001)
