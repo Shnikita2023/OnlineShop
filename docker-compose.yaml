@@ -79,7 +79,7 @@ services:
     networks:
       - custom
 
-  celery:
+  worker:
     build:
       context: .
       dockerfile: Dockerfile
@@ -103,7 +103,7 @@ services:
       dockerfile: Dockerfile
     container_name: "flower_shop"
     depends_on:
-      - celery
+      - worker
     ports:
       - "5555:5555"
     networks:

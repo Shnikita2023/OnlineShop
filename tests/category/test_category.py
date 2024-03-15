@@ -3,7 +3,9 @@ from httpx import AsyncClient, Response
 
 
 class TestCategory:
-    """Класс для тестирования категории"""
+    """
+    Класс для тестирования категории
+    """
 
     @pytest.mark.parametrize(
         "name, description",

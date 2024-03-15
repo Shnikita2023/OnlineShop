@@ -3,7 +3,9 @@ from httpx import Response, AsyncClient
 
 
 class TestProduct:
-    """Класс для тестирования продукта"""
+    """
+    Класс для тестирования продукта
+    """
 
     @pytest.mark.parametrize("name, description, price, quantity, reserved_quantity, name_image, discount",
                              [

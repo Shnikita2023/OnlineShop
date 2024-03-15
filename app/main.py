@@ -37,6 +37,7 @@ async def startup():
     async for redis_client in get_async_redis_client():
         FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
 
+
 app.add_middleware(RateLimitMiddleware)
 
 app.add_middleware(PrometheusMiddleware)

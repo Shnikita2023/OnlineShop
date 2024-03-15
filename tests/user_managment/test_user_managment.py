@@ -6,7 +6,10 @@ from app.config import settings
 
 
 class TestUserManagement:
-    """Класс для работы с пользователем"""
+    """
+    Класс для работы с пользователем
+    """
+
     user_register_data = {
         "username": "User",
         "password": "string1fadH!",

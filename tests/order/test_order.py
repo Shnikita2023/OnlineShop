@@ -6,6 +6,7 @@ class TestUserOrder:
     """
     Класс для тестирования заказа пользователя
     """
+
     order_user = {
         "total_price": 0.0,
         "cost_delivery": "Free",
