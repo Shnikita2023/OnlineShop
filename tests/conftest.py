@@ -12,6 +12,8 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, AsyncEngine, async_sessionmaker
 from sqlalchemy.pool import NullPool
 
+from app.api_v1.depends.dependencies import get_session
+from app.api_v1.utils.unitofwork import UnitOfWork
 from app.main import app
 from app.config import settings
 from app.db import Base, get_async_session, async_session_maker
@@ -43,8 +45,13 @@ async def get_async_session_test() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
+async def get_session_test() -> UnitOfWork:
+    """Получение экземпляра класса с тестовой сессии"""
+    return UnitOfWork(session_factory=async_session_maker_test)
+
 app.dependency_overrides[async_session_maker] = async_session_maker_test
 app.dependency_overrides[get_async_session] = get_async_session_test
+app.dependency_overrides[get_session] = get_session_test
 app.dependency_overrides[pool_redis] = pool_redis_test
 app.dependency_overrides[get_async_redis_client] = get_async_redis_client_test
 

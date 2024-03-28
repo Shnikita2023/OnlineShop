@@ -58,4 +58,4 @@ sentry_sdk.init(
 )
 
 if __name__ == "__main__":
-    uvicorn.run(app=app, port=8001)
+    uvicorn.run(app=app, port=8000)

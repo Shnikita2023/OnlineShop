@@ -2,13 +2,12 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, status
 from fastapi_cache.decorator import cache
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_v1.auth import AuthUser
+from app.api_v1.depends.dependencies import UOWDep
 from app.api_v1.exceptions import HttpAPIException
 from app.api_v1.products.schemas import ProductShow, ProductCreate, ProductUpdate
 from app.api_v1.products.services import product_service
-from app.db import get_async_session
 
 router = APIRouter(
     prefix="/products",
@@ -21,17 +20,17 @@ router = APIRouter(
             response_model=ProductShow
             )
 async def get_product(product_id: int,
-                      session: AsyncSession = Depends(get_async_session)) -> ProductShow:
-    return await product_service.get_product(id_product=product_id, session=session)
+                      uow: UOWDep) -> ProductShow:
+    return await product_service.get_product(id_product=product_id, uow=uow)
 
 
 @router.get(path="/",
             summary='Получение продукта по параметрам'
             )
 async def get_product_by_product(product_value: Any,
-                                 param_colum_product: str = "name",
-                                 session: AsyncSession = Depends(get_async_session)) -> ProductShow:
-    return await product_service.get_product_by_param(session=session,
+                                 uow: UOWDep,
+                                 param_colum_product: str = "name") -> ProductShow:
+    return await product_service.get_product_by_param(uow=uow,
                                                       param_colum_product=param_colum_product,
                                                       product_value=product_value)
 
@@ -41,8 +40,8 @@ async def get_product_by_product(product_value: Any,
             response_model=list[ProductShow]
             )
 @cache(expire=60)
-async def get_products(session: AsyncSession = Depends(get_async_session)) -> list[ProductShow]:
-    return await product_service.get_products(session=session)
+async def get_products(uow: UOWDep) -> list[ProductShow]:
+    return await product_service.get_products(uow=uow)
 
 
 @router.post(path="/",
@@ -50,11 +49,10 @@ async def get_products(session: AsyncSession = Depends(get_async_session)) -> li
              status_code=status.HTTP_201_CREATED
              )
 async def create_product(product_data: ProductCreate,
-                         session: AsyncSession = Depends(get_async_session),
+                         uow: UOWDep,
                          user: dict = Depends(AuthUser.get_current_auth_user)) -> dict:
-
     if user["is_superuser"] is True:
-        number_product: int = await product_service.add_product(session=session, product_data=product_data)
+        number_product: int = await product_service.add_product(uow=uow, product_data=product_data)
 
         return {
             "message": f"Product creates with {number_product} number successfully",
@@ -70,11 +68,10 @@ async def create_product(product_data: ProductCreate,
                )
 async def delete_product(
         product_id: int,
-        session: AsyncSession = Depends(get_async_session),
+        uow: UOWDep,
         user: dict = Depends(AuthUser.get_current_auth_user)) -> None:
-
     if user["is_superuser"] is True:
-        await product_service.delete_product(id_product=product_id, session=session)
+        await product_service.delete_product(id_product=product_id, uow=uow)
 
         return None
 
@@ -87,12 +84,11 @@ async def delete_product(
 async def update_product(
         product_id: int,
         product_update: ProductUpdate,
-        session: AsyncSession = Depends(get_async_session),
+        uow: UOWDep,
         user: dict = Depends(AuthUser.get_current_auth_user)) -> dict[str, Any]:
-
     if user["is_superuser"] is True:
         return await product_service.update_product(id_product=product_id,
-                                                    session=session,
+                                                    uow=uow,
                                                     new_product=product_update)
 
     raise HttpAPIException(exception="access denied.").http_error_403

@@ -50,7 +50,6 @@ class SQLAlchemyRepository(AbstractRepository):
         try:
             stmt = insert(self.model).values(**data).returning(self.model.id)
             result = await self.session.execute(stmt)
-            await self.session.commit()
             return result.scalar_one()
 
         except ConnectionError:
@@ -117,7 +116,6 @@ class SQLAlchemyRepository(AbstractRepository):
             if find_id:
                 stmt = delete(self.model).where(self.model.id == id_data).returning(self.model.id)
                 result = await self.session.execute(stmt)
-                await self.session.commit()
                 return result.scalar_one()
 
             raise HttpAPIException(exception="id is not found").http_error_400
@@ -132,7 +130,6 @@ class SQLAlchemyRepository(AbstractRepository):
             if find_id:
                 stmt = update(self.model).where(self.model.id == id_data).values(new_data)
                 await self.session.execute(stmt)
-                await self.session.commit()
                 return new_data
 
             raise HttpAPIException(exception="id is not found").http_error_400

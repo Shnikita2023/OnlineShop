@@ -2,13 +2,12 @@ from redis.asyncio.client import Redis
 from starlette import status
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import get_async_session
 from app.api_v1.auth import AuthUser
 from . import OrderCreate, OrderItemCreate, OrderUpdate, OrderShow
 from .services import order_service, order_item_service
 from app.api_v1.exceptions import HttpAPIException
+from ..depends.dependencies import UOWDep
 from ...db.database import get_async_redis_client
 
 router_order = APIRouter(
@@ -26,11 +25,11 @@ router_order_item = APIRouter(
                    summary="Создание заказа пользователя",
                    status_code=status.HTTP_201_CREATED)
 async def create_order(order: OrderCreate,
-                       session: AsyncSession = Depends(get_async_session),
+                       uow: UOWDep,
                        redis_client: Redis = Depends(get_async_redis_client),
                        user: dict = Depends(AuthUser.get_current_auth_user)) -> dict[str, str]:
     if order.user_id == user["sub"]:
-        number_order: int = await order_service.create_order(session=session,
+        number_order: int = await order_service.create_order(uow=uow,
                                                              order_data=order,
                                                              redis_client=redis_client)
         return {
@@ -44,10 +43,10 @@ async def create_order(order: OrderCreate,
                   summary="Получение заказа пользователя",
                   response_model=OrderShow)
 async def get_order(order_id: int,
+                    uow: UOWDep,
                     redis_client: Redis = Depends(get_async_redis_client),
-                    session: AsyncSession = Depends(get_async_session),
                     user: dict = Depends(AuthUser.get_current_auth_user)) -> OrderShow:
-    return await order_service.get_order(session=session,
+    return await order_service.get_order(uow=uow,
                                          user_current=user,
                                          redis_client=redis_client,
                                          order_id=order_id)
@@ -58,9 +57,9 @@ async def get_order(order_id: int,
                   response_model=OrderUpdate)
 async def update_order(order_id: int,
                        new_order: OrderUpdate,
-                       session: AsyncSession = Depends(get_async_session),
+                       uow: UOWDep,
                        user: dict = Depends(AuthUser.get_current_auth_user)) -> OrderUpdate:
-    return await order_service.update_order(session=session,
+    return await order_service.update_order(uow=uow,
                                             new_order=new_order,
                                             order_id=order_id,
                                             user_current=user)
@@ -70,9 +69,9 @@ async def update_order(order_id: int,
                      summary="Удаление заказа пользователя",
                      status_code=status.HTTP_204_NO_CONTENT)
 async def delete_order(order_id: int,
-                       session: AsyncSession = Depends(get_async_session),
+                       uow: UOWDep,
                        user: dict = Depends(AuthUser.get_current_auth_user)) -> None:
-    await order_service.delete_order(session=session,
+    await order_service.delete_order(uow=uow,
                                      order_id=order_id,
                                      user_current=user)
     return None
@@ -82,10 +81,10 @@ async def delete_order(order_id: int,
                         summary="Создание элементов заказа пользователя",
                         status_code=status.HTTP_201_CREATED)
 async def create_order_item(order_item: OrderItemCreate,
-                            session: AsyncSession = Depends(get_async_session),
+                            uow: UOWDep,
                             redis_client: Redis = Depends(get_async_redis_client),
                             user: dict = Depends(AuthUser.get_current_auth_user)) -> dict[str, str]:
-    number_order_item: int = await order_item_service.add_order_item(session=session,
+    number_order_item: int = await order_item_service.add_order_item(uow=uow,
                                                                      order_item_data=order_item,
                                                                      user_current=user,
                                                                      redis_client=redis_client)
